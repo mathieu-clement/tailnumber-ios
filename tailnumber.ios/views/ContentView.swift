@@ -54,7 +54,7 @@ struct ContentView: View {
 //                            }
                 }
 
-                Spacer()
+//                Spacer()
             }
                     .padding()
                     .navigationTitle("Search")

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Logging
 
 enum RegistrationServiceError {
     case RegistrationNotFound, RegistrantNotFound, CountryNotFound, JsonError(_ error: Error), UnknownError
@@ -15,6 +16,17 @@ class RegistrationService: ObservableObject {
 
     private let basePath = "https://tailnumber-service-dev.edelweiss-software.com/registrations"
 
+    private let jsonDecoder = JSONDecoder()
+
+    private let logger = Logger(label: "RegistrationService")
+
+    init() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.locale = Locale(identifier: "en_US")
+        jsonDecoder.dateDecodingStrategy = .formatted(dateFormatter)
+    }
+
     func fetchTailnumbersAsync(startingWith prefix: String,
                                onResult: @escaping ([AutocompleteResult]) -> Void) {
         let url = URL(string: "\(basePath)/autocomplete/\(prefix)")!
@@ -23,7 +35,8 @@ class RegistrationService: ObservableObject {
 
         URLSession.shared.dataTask(with: url) { data, response, error in
                     if let error = error {
-                        print("Error: \(error)")
+                        self.logger.error("Error with autocomplete: \(error.localizedDescription)")
+                        Commons.alert(title: "Error", message: error.localizedDescription)
                     }
                     switch ((response as? HTTPURLResponse)?.statusCode) {
                     case 200:
@@ -53,12 +66,18 @@ class RegistrationService: ObservableObject {
 
         URLSession.shared.dataTask(with: url) { data, response, error in
                     if let error = error {
-                        print("Error: \(error)")
+                        self.logger.error("Error fetching registration: \(error)")
+                        Commons.alert(title: "Error", message: error.localizedDescription)
+                        return
                     }
                     switch ((response as? HTTPURLResponse)?.statusCode) {
                     case 200:
                         if let data = data {
-                            if let registration = self.decodeRegistration(fromJson: data, onFailure: { jsonError in onFailure(jsonError) }) {
+                            if let registration = self.decodeRegistration(fromJson: data, onFailure: { jsonError in
+                                self.logger.error("JSON error: \(jsonError)")
+                                onFailure(jsonError)
+                            }
+                            ) {
                                 onSuccess(registration)
                             }
                         }
@@ -76,7 +95,7 @@ class RegistrationService: ObservableObject {
 
     private func decodeRegistration(fromJson data: Data, onFailure: @escaping (RegistrationServiceError) -> Void) -> Registration? {
         do {
-            return try JSONDecoder().decode(Registration.self, from: data)
+            return try jsonDecoder.decode(Registration.self, from: data)
         } catch {
             // TODO handle errors better
             onFailure(RegistrationServiceError.JsonError(error))
@@ -86,7 +105,7 @@ class RegistrationService: ObservableObject {
 
     private func decodeAutocompleteResults(fromJson data: Data, onFailure: @escaping (RegistrationServiceError) -> Void) -> [AutocompleteResult] {
         do {
-            return try JSONDecoder().decode([AutocompleteResult].self, from: data)
+            return try jsonDecoder.decode([AutocompleteResult].self, from: data)
         } catch {
             // TODO handle errors better
             onFailure(RegistrationServiceError.JsonError(error))
