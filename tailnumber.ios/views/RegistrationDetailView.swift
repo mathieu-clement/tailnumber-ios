@@ -66,30 +66,28 @@ struct RegistrationDetailView: View {
             registrationRows.append(RegistrationDetailRow(label: "Address", value: joinNotNull(fields, separator: "\n")))
         }
         if (registration.owner == registration.operator) {
-            registrationRows.append(RegistrationDetailRow(label: "Owner / Operator", value: replaceCommasWithNewlines(registration.owner)))
+            registrationRows.append(RegistrationDetailRow(label: "Registrant", value: replaceCommasWithNewlines(registration.owner)))
         } else {
             registrationRows.append(RegistrationDetailRow(label: "Owner", value: replaceCommasWithNewlines(registration.owner)))
             registrationRows.append(RegistrationDetailRow(label: "Operator", value: replaceCommasWithNewlines(registration.operator)))
         }
 
-        var airworthiness = [registration.airworthiness?.certificateClass?.smartCapitalized]
+        var airworthiness = [registration.airworthiness?.certificateClass?.fromJavaEnum]
         if let approvedOperation = registration.airworthiness?.approvedOperation {
             airworthiness += approvedOperation.map { s in
-                s.fromJavaEnum
+                s.replacingOccurrences(of: "_", with: " ").lowercased()
             }
         }
         if !airworthiness.isEmpty && !airworthiness.allSatisfy({ s in s == nil }) {
-            registrationRows.append(RegistrationDetailRow(label: "Airworthiness categories", value: joinNotNull(
-                    airworthiness.map { s in
-                        s?.fromJavaEnum
-                    })))
+            registrationRows.append(RegistrationDetailRow(label: "Airworthiness categories",
+                    value: joinNotNull(airworthiness)))
         }
 
         registrationRows.append(RegistrationDetailRow(label: "Airworthiness date", value: registration.airworthiness?.airworthinessDate?.usFormat))
         registrationRows.append(RegistrationDetailRow(label: "Issue date", value: registration.certificateIssueDate?.usFormat))
         registrationRows.append(RegistrationDetailRow(label: "Last activity", value: registration.lastActivityDate?.usFormat))
         registrationRows.append(RegistrationDetailRow(label: "Expiration", value: registration.expirationDate?.usFormat))
-        registrationRows.append(RegistrationDetailRow(label: "Country", value: registration.registrationId.country.fullName))
+//        registrationRows.append(RegistrationDetailRow(label: "Country", value: registration.registrationId.country.fullName))
         sections.append(RegistrationDetailSection(label: "Registration", rows: registrationRows))
 
         var aircraftRows: [RegistrationDetailRow] = []
@@ -120,7 +118,25 @@ struct RegistrationDetailView: View {
             return nil
         }
 
-        return input?.replacingOccurrences(of: ", ", with: "\n")
+        var result = ""
+
+        let parts = input!.components(separatedBy: ", ")
+        var numPartsAdded = 0
+        if parts.count == 1 || parts[1].containsDigits() || parts[1].contains("c/o") {
+            result += parts[0]
+            numPartsAdded = 1
+        } else {
+            result += parts[0] + " " + parts[1]
+            numPartsAdded = 2
+        }
+
+        let otherParts = parts[numPartsAdded..<parts.count]
+        if !otherParts.isEmpty {
+            result += "\n"
+            result += otherParts.joined(separator: "\n")
+        }
+
+        return result
     }
 
     private func fetchRegistration() {

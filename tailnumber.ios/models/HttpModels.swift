@@ -48,8 +48,9 @@ struct AutocompleteResult: Decodable, Identifiable, Hashable {
         let parts = `operator`!.components(separatedBy: ", ")
         if parts.count == 1 || parts[1].containsDigits() || parts[1].contains("c/o") {
             return parts[0]
+        } else {
+            return parts[0] + " " + parts[1]
         }
-        return parts[0] + " " + parts[1]
     }
 
     var aircraftName: String? {

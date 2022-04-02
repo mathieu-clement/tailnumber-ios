@@ -38,7 +38,7 @@ extension String {
 
         var words : [String] = []
         self.components(separatedBy: " ").forEach { word in
-            if (word == "de" || word == "du" || numberedStreetRegex.matches(word)) {
+            if (word == "DE" || word == "DU" || numberedStreetRegex.matches(word)) {
                 words.append(word.lowercased())
             } else if (word == "BOX" || word == "INC" || word == "RD" || word == "ST" || word == "WY" || word == "LN"
                     || word == "CO" || word == "STE" || word == "APT" || word == "DR" || word == "CIR" || word == "HWY"
@@ -53,7 +53,10 @@ extension String {
     }
 
     var fromJavaEnum: String {
-        self.replacingOccurrences(of: "_", with: " ").smartCapitalized
+        // Capitalize first word only
+        var words = self.components(separatedBy: "_").map { s in s.lowercased() }
+        words[0] = words[0].capitalized
+        return words.joined(separator: " ")
     }
 }
 
