@@ -13,6 +13,12 @@ extension HasApply {
     }
 }
 
+extension NSRegularExpression {
+    func matches(_ word: String) -> Bool {
+        firstMatch(in: word, options: [], range: NSRange(location: 0, length: word.utf16.count)) != nil
+    }
+}
+
 extension String {
     func containsDigits() -> Bool {
         self.contains { c in
@@ -28,13 +34,15 @@ extension String {
 
     // TODO this should be on the server side
     var smartCapitalized: String {
+        let numberedStreetRegex = try! NSRegularExpression(pattern: "[0-9]+(ST|TH|RD)")
+
         var words : [String] = []
         self.components(separatedBy: " ").forEach { word in
-            if (word == "de" || word == "du") {
+            if (word == "de" || word == "du" || numberedStreetRegex.matches(word)) {
                 words.append(word.lowercased())
             } else if (word == "BOX" || word == "INC" || word == "RD" || word == "ST" || word == "WY" || word == "LN"
                     || word == "CO" || word == "STE" || word == "APT" || word == "DR" || word == "CIR" || word == "HWY"
-                    || word == "MT"
+                    || word == "MT" || word == "CT"
                     || (word.count > 2 && word != "LLC")) {
                 words.append(word.lowercased().capitalized)
             } else {
