@@ -26,6 +26,7 @@ extension String {
         }
     }
 
+    // TODO this should be on the server side
     var smartCapitalized: String {
         var words : [String] = []
         self.components(separatedBy: " ").forEach { word in
@@ -33,7 +34,8 @@ extension String {
                 words.append(word.lowercased())
             } else if (word == "BOX" || word == "INC" || word == "RD" || word == "ST" || word == "WY" || word == "LN"
                     || word == "CO" || word == "STE" || word == "APT" || word == "DR" || word == "CIR" || word == "HWY"
-                    || word.count > 3) {
+                    || word == "MT"
+                    || (word.count > 2 && word != "LLC")) {
                 words.append(word.lowercased().capitalized)
             } else {
                 words.append(word)
