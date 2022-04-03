@@ -24,41 +24,23 @@ struct SearchView: View {
         })
 
         NavigationView {
-
-            VStack {
-                VStack(alignment: .leading) {
-//                Spacer()
-                    Text("Search by tail number / aircraft registration").font(.headline)
-                    TextField("Tail number", text: tailnumberBinding)//.onSubmit(fetchRegistration)
-                }
-                        .padding()
-
-                List(autocompleteResults, id: \.self) { result in
-                    let detailView = RegistrationDetailView(forTailnumber: result.registrationId.id)
-                    NavigationLink(destination: detailView) {
-                        VStack(alignment: .leading) {
-                            Text(result.registrationId.id).font(.subheadline)
-                            if let aircraftName = result.aircraftName {
-                                Text(aircraftName).font(.caption).foregroundColor(.gray)
-                            }
-                            if let name = result.registrantNameOrOperator {
-                                Text(name).font(.caption2).foregroundColor(.gray)
-                            }
+            List(autocompleteResults, id: \.self) { result in
+                let detailView = RegistrationDetailView(forTailnumber: result.registrationId.id)
+                NavigationLink(destination: detailView) {
+                    VStack(alignment: .leading) {
+                        Text(result.registrationId.id).font(.subheadline)
+                        if let aircraftName = result.aircraftName {
+                            Text(aircraftName).font(.caption).foregroundColor(.gray)
                         }
-                                .contentShape(Rectangle())
+                        if let name = result.registrantNameOrOperator {
+                            Text(name).font(.caption2).foregroundColor(.gray)
+                        }
                     }
-//                            .onTapGesture {
-//                                tailnumber = result.registrationId.id
-//                                detailView.fetchRegistration()
-////                                onNavigateToRegistrationScreen()
-//                            }
                 }
-
-//                Spacer()
-            }
-                    .padding()
+            } // List
                     .navigationTitle("Search")
-        }
+        } // NavigationView
+                .searchable(text: tailnumberBinding, prompt: "Tail number (N123, HB-ABC...)")
     }
 
     private func onKeyPressed() {

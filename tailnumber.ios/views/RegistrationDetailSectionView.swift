@@ -12,10 +12,6 @@ struct RegistrationDetailSectionView: View {
 
     var body: some View {
         if !rows.isEmpty && rows.contains(where: { row in row.value != nil }) {
-//            Text(label)
-//                    .font(.title)
-//                    .padding([.bottom], 5)
-
             VStack(alignment: .leading) {
                 ForEach(0..<rows.count, id: \.self) { i in
                     if i < rows.count {
