@@ -6,8 +6,6 @@ import Foundation
 
 class RegistrationDetailManager {
 
-    private let locationManager = LocationManager()
-
     func registrationSection(forRegistration registration: Registration) -> RegistrationDetailSection {
         var registrationRows: [RegistrationDetailRow] = []
         if registration.status != "VALID" {
@@ -30,9 +28,8 @@ class RegistrationDetailManager {
             let addressString = joinNotNull(fields, separator: "\n")
             registrationRows.append(RegistrationDetailRow(
                     label: "Address",
-                    value: addressString) {
-                self.locationManager.openMapWithAddress(addressString)
-            })
+                    value: addressString,
+                    menuType: .address))
         }
         if (registration.owner == registration.operator) {
             registrationRows.append(RegistrationDetailRow(label: "Registrant", value: replaceCommasWithNewlines(registration.owner)))

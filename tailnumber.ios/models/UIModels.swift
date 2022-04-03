@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct RegistrationDetailSection: Identifiable {
     let label: String
@@ -15,7 +16,7 @@ struct RegistrationDetailRow: Identifiable, Hashable {
     let label: String
     let value: String?
     var emphasized: Bool = false
-    var onTapGesture: () -> Void = { }
+    var menuType: MenuType? = nil
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
@@ -24,4 +25,12 @@ struct RegistrationDetailRow: Identifiable, Hashable {
     static func ==(lhs: RegistrationDetailRow, rhs: RegistrationDetailRow) -> Bool {
         lhs.id == rhs.id
     }
+}
+
+enum MenuType {
+    case address
+}
+
+class SearchText: ObservableObject {
+    @Published var value = ""
 }

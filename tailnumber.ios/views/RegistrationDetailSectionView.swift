@@ -10,6 +10,11 @@ struct RegistrationDetailSectionView: View {
     let label: String
     let rows: [RegistrationDetailRow]
 
+    private let locationManager = LocationManager()
+
+    @EnvironmentObject var searchText : SearchText
+    @Environment(\.presentationMode) var presentation
+
     var body: some View {
         if !rows.isEmpty && rows.contains(where: { row in row.value != nil }) {
             VStack(alignment: .leading) {
@@ -23,10 +28,26 @@ struct RegistrationDetailSectionView: View {
                                         .bold()
                                 Spacer()
                                 ValueTextView(value: value, emphasize: row.emphasized)
+                                        .contextMenu {
+                                            if let menuType = row.menuType {
+                                                switch (menuType) {
+                                                case .address:
+                                                    Button {
+                                                        locationManager.openMapWithAddress(value)
+                                                    } label: {
+                                                        Label("Open in Maps", systemImage: "location.circle")
+                                                    }
+
+                                                    /*Button {
+                                                        presentation.wrappedValue.dismiss()
+                                                        searchText.value = value
+                                                    } label: {
+                                                        Label("Registrations at this address", systemImage: "magnifyingglass.circle")
+                                                    }*/
+                                                }
+                                            }
+                                        }
                             }
-                                    .onTapGesture {
-                                        row.onTapGesture()
-                                    }
                             if (i != rows.count - 1) {
                                 Divider()
                             }

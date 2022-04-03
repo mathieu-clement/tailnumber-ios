@@ -109,8 +109,3 @@ struct RegistrationDetailView: View {
 
 }
 
-struct Previews_RegistrationDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        RegistrationDetailView(forTailnumber: "N12234")
-    }
-}

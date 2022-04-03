@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SearchView: View {
     private let registrationService = RegistrationService()
-    @State private var searchText: String = ""
+    @StateObject private var searchText = SearchText()
     @State private var autocompleteResults: [AutocompleteResult] = []
     @State private var model: String = ""
     @State private var isSearching = false
@@ -17,9 +17,9 @@ struct SearchView: View {
     private let navigationTitle = "Tail Number"
 
     var body: some View {
-        let searchTextBinding = Binding<String>(get: { searchText }, set: {
-            searchText = $0//.uppercased()
-            if searchText.count > 2 {
+        let searchTextBinding = Binding<String>(get: { searchText.value }, set: {
+            searchText.value = $0//.uppercased()
+            if searchText.value.count > 2 {
                 isSearching = true
                 fetchSuggestions()
             } else {
@@ -29,7 +29,7 @@ struct SearchView: View {
 
         NavigationView {
 
-            if searchText.isEmpty {
+            if searchText.value.isEmpty {
                 VStack {
                     Text("Enter a tail number (e.g. N123 or HB-ABC), the owner name or part of the address")
                             .font(.caption)
@@ -37,7 +37,7 @@ struct SearchView: View {
                 }
                         .padding()
                         .navigationTitle(navigationTitle)
-            } else if !isSearching && searchText.count > 2 && autocompleteResults.isEmpty {
+            } else if !isSearching && searchText.value.count > 2 && autocompleteResults.isEmpty {
                 VStack {
                     Text("😔").font(.title)
                     Text("No results.").font(.caption)
@@ -47,7 +47,7 @@ struct SearchView: View {
                         .navigationTitle(navigationTitle)
             } else {
                 ZStack {
-                    NavigationLink(destination: RegistrationDetailView(forTailnumber: searchText), isActive: $navigateOnSubmitEnabled) {
+                    NavigationLink(destination: RegistrationDetailView(forTailnumber: searchText.value), isActive: $navigateOnSubmitEnabled) {
 
                     }.hidden()
                     List(autocompleteResults, id: \.self) { result in
@@ -73,10 +73,11 @@ struct SearchView: View {
                     navigateOnSubmitEnabled = true
                     isSearching = false
                 }
+                .environmentObject(searchText)
     }
 
     private func fetchSuggestions() {
-        registrationService.autocompleteTailnumberOrRegistrant(tailNumberOrRegistrant: searchText) { results in
+        registrationService.autocompleteTailnumberOrRegistrant(tailNumberOrRegistrant: searchText.value) { results in
             autocompleteResults = results
             isSearching = false
         }
