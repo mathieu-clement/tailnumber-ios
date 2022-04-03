@@ -17,7 +17,7 @@ struct RegistrationDetailSectionView: View {
 //                    .padding([.bottom], 5)
 
             VStack(alignment: .leading) {
-                ForEach(0..<rows.count) { i in
+                ForEach(0..<rows.count, id: \.self) { i in
                     if i < rows.count {
                         let row = rows[i]
                         if let value = row.value {

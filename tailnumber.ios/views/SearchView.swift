@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct SearchView: View {
     private let registrationService = RegistrationService()
     @State private var tailnumber: String = ""
     @State private var autocompleteResults: [AutocompleteResult] = []
@@ -70,6 +70,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        SearchView()
     }
 }

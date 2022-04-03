@@ -28,7 +28,7 @@ struct RegistrationDetailView: View {
         } else {
             VStack {
                 Picker(selection: $selectedSection, label: Text("Section:")) {
-                    ForEach(0..<sections.count) { i in
+                    ForEach(0..<sections.count, id: \.self) { i in
                         Text(sections[i].label)
                     }
                 }
