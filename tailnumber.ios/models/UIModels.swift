@@ -15,4 +15,13 @@ struct RegistrationDetailRow: Identifiable, Hashable {
     let label: String
     let value: String?
     var emphasized: Bool = false
+    var onTapGesture: () -> Void = { }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
+    static func ==(lhs: RegistrationDetailRow, rhs: RegistrationDetailRow) -> Bool {
+        lhs.id == rhs.id
+    }
 }

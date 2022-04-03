@@ -24,6 +24,9 @@ struct RegistrationDetailSectionView: View {
                                 Spacer()
                                 ValueTextView(value: value, emphasize: row.emphasized)
                             }
+                                    .onTapGesture {
+                                        row.onTapGesture()
+                                    }
                             if (i != rows.count - 1) {
                                 Divider()
                             }

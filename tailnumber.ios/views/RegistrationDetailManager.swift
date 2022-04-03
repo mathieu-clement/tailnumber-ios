@@ -5,6 +5,9 @@
 import Foundation
 
 class RegistrationDetailManager {
+
+    private let locationManager = LocationManager()
+
     func registrationSection(forRegistration registration: Registration) -> RegistrationDetailSection {
         var registrationRows: [RegistrationDetailRow] = []
         if registration.status != "VALID" {
@@ -13,7 +16,7 @@ class RegistrationDetailManager {
                     emphasized: true))
         }
         registrationRows.append(RegistrationDetailRow(label: "Name", value:
-            registration.registrant?.name != "SALE REPORTED"
+            registration.registrant?.name != "SALE REPORTED" && registration.registrant?.name != "REGISTRATION PENDING"
                     ? registration.registrant?.name.smartCapitalized
                     : "Unknown"))
         if registration.registrant?.name.hasSuffix("LLC") == false {
@@ -24,7 +27,12 @@ class RegistrationDetailManager {
             let cityAndStateAndZip: String = joinNotNull([cityAndState, address.zipCode])
             let fields = [address.street1?.smartCapitalized, address.street2?.smartCapitalized,
                           cityAndStateAndZip, address.country]
-            registrationRows.append(RegistrationDetailRow(label: "Address", value: joinNotNull(fields, separator: "\n")))
+            let addressString = joinNotNull(fields, separator: "\n")
+            registrationRows.append(RegistrationDetailRow(
+                    label: "Address",
+                    value: addressString) {
+                self.locationManager.openMapWithAddress(addressString)
+            })
         }
         if (registration.owner == registration.operator) {
             registrationRows.append(RegistrationDetailRow(label: "Registrant", value: replaceCommasWithNewlines(registration.owner)))
