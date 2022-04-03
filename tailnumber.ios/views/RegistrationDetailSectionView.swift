@@ -22,9 +22,13 @@ struct RegistrationDetailSectionView: View {
                         let row = rows[i]
                         if let value = row.value {
                             HStack(alignment: .top) {
-                                Text(row.label).bold()
+                                Text(row.label)
+                                        .font(.subheadline)
+                                        .bold()
                                 Spacer()
-                                Text(value).multilineTextAlignment(.trailing)
+                                Text(value)
+                                        .font(.subheadline)
+                                        .multilineTextAlignment(.trailing)
                             }
                             if (i != rows.count - 1) {
                                 Divider()
