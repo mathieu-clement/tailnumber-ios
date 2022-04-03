@@ -15,6 +15,14 @@ struct RegistrationDetailView: View {
     @State private var registration: Registration? = nil
     @State private var sections: [RegistrationDetailSection] = []
     @State private var selectedSection = 0
+    @Environment(\.presentationMode) var presentation
+    private static var loadingTexts = [
+        "Priming the engine",
+        "Fetching data",
+        "Spooling up the engines",
+        "Tuning in the frequency"
+    ]
+    private var loadingText : String = loadingTexts[Int.random(in: 0..<loadingTexts.count)]
 
     init(forTailnumber: String) {
         tailnumber = forTailnumber
@@ -22,7 +30,7 @@ struct RegistrationDetailView: View {
 
     var body: some View {
         if (registration == nil) {
-            Text("Fetching data...").onAppear {
+            Text("\(loadingText)...").onAppear {
                 fetchRegistration()
             }
         } else {
@@ -42,7 +50,7 @@ struct RegistrationDetailView: View {
                 }
             }
                     .padding()
-                    .navigationTitle(tailnumber)
+                    .navigationTitle(registration?.registrationId.id ?? tailnumber)
         }
     }
 
@@ -140,7 +148,7 @@ struct RegistrationDetailView: View {
     }
 
     private func fetchRegistration() {
-        logger.info("Fetching registration async for \(tailnumber)...")
+        logger.debug("Fetching registration async for \(tailnumber)...")
 
         registrationService.fetchRegistrationAsync(forTailNumber: tailnumber,
                 onSuccess: { reg in
@@ -166,7 +174,17 @@ struct RegistrationDetailView: View {
                         title = "Unknown error"
                         message = "An unknown error occurred. We are investigating it."
                     }
-                    Commons.alert(title: title, message: message)
+
+                    DispatchQueue.main.async {
+                        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "Go back", style: .cancel, handler: { _ in
+                            presentation.wrappedValue.dismiss()
+                        }))
+                        alert.addAction(UIAlertAction(title: "Try again", style: .default, handler: { _ in
+                            fetchRegistration()
+                        }))
+                        UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true)
+                    }
                 })
     }
 

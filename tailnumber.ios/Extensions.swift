@@ -43,7 +43,7 @@ extension String {
             } else if (word == "BOX" || word == "INC" || word == "RD" || word == "ST" || word == "WY" || word == "LN"
                     || word == "CO" || word == "STE" || word == "APT" || word == "DR" || word == "CIR" || word == "HWY"
                     || word == "MT" || word == "CT"
-                    || (word.count > 2 && word != "LLC")) {
+                    || (word.count > 2 && word != "LLC" && word != "II" && word != "III")) {
                 words.append(word.lowercased().capitalized)
             } else {
                 words.append(word)

@@ -9,43 +9,76 @@ import SwiftUI
 
 struct SearchView: View {
     private let registrationService = RegistrationService()
-    @State private var tailnumber: String = ""
+    @State private var searchText: String = ""
     @State private var autocompleteResults: [AutocompleteResult] = []
     @State private var model: String = ""
+    @State private var isSearching = false
+    @State private var navigateOnSubmitEnabled = false
+    private let navigationTitle = "Tail Number"
 
     var body: some View {
-        let tailnumberBinding = Binding<String>(get: { tailnumber }, set: {
-            tailnumber = $0.uppercased()
-            if tailnumber.count > 2 {
-                onKeyPressed()
+        let searchTextBinding = Binding<String>(get: { searchText }, set: {
+            searchText = $0//.uppercased()
+            if searchText.count > 2 {
+                isSearching = true
+                fetchSuggestions()
             } else {
                 autocompleteResults = []
             }
         })
 
         NavigationView {
-            List(autocompleteResults, id: \.self) { result in
-                let detailView = RegistrationDetailView(forTailnumber: result.registrationId.id)
-                NavigationLink(destination: detailView) {
-                    VStack(alignment: .leading) {
-                        Text(result.registrationId.id).font(.subheadline)
-                        if let aircraftName = result.aircraftName {
-                            Text(aircraftName).font(.caption).foregroundColor(.gray)
-                        }
-                        if let name = result.registrantNameOrOperator {
-                            Text(name).font(.caption2).foregroundColor(.gray)
-                        }
-                    }
+
+            if searchText.isEmpty {
+                VStack {
+                    Text("Enter a tail number (e.g. N123 or HB-ABC), the owner name or part of the address")
+                            .font(.caption)
+                    Spacer()
                 }
-            } // List
-                    .navigationTitle("Search")
+                        .padding()
+                        .navigationTitle(navigationTitle)
+            } else if !isSearching && searchText.count > 2 && autocompleteResults.isEmpty {
+                VStack {
+                    Text("😔").font(.title)
+                    Text("No results.").font(.caption)
+                    Spacer()
+                }
+                        .padding()
+                        .navigationTitle(navigationTitle)
+            } else {
+                ZStack {
+                    NavigationLink(destination: RegistrationDetailView(forTailnumber: searchText), isActive: $navigateOnSubmitEnabled) {
+
+                    }.hidden()
+                    List(autocompleteResults, id: \.self) { result in
+                        let detailView = RegistrationDetailView(forTailnumber: result.registrationId.id)
+                        NavigationLink(destination: detailView) {
+                            VStack(alignment: .leading) {
+                                Text(result.registrationId.id).font(.subheadline)
+                                if let aircraftName = result.aircraftName {
+                                    Text(aircraftName).font(.caption).foregroundColor(.gray)
+                                }
+                                if let name = result.registrantNameOrOperator {
+                                    Text(name).font(.caption2).foregroundColor(.gray)
+                                }
+                            }
+                        }
+                    } // List
+                }
+                        .navigationTitle(navigationTitle)
+            }
         } // NavigationView
-                .searchable(text: tailnumberBinding, prompt: "Tail number (N123, HB-ABC...)")
+                .searchable(text: searchTextBinding, prompt: "Registration, Owner, Address")
+                .onSubmit(of: .search) {
+                    navigateOnSubmitEnabled = true
+                    isSearching = false
+                }
     }
 
-    private func onKeyPressed() {
-        registrationService.fetchTailnumbersAsync(startingWith: tailnumber) { results in
+    private func fetchSuggestions() {
+        registrationService.autocompleteTailnumberOrRegistrant(tailNumberOrRegistrant: searchText) { results in
             autocompleteResults = results
+            isSearching = false
         }
     }
 }

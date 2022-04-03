@@ -27,16 +27,30 @@ class RegistrationService: ObservableObject {
         jsonDecoder.dateDecodingStrategy = .formatted(dateFormatter)
     }
 
-    func fetchTailnumbersAsync(startingWith prefix: String,
-                               onResult: @escaping ([AutocompleteResult]) -> Void) {
-        let url = URL(string: "\(basePath)/autocomplete/\(prefix)")!
+    func autocompleteTailnumberOrRegistrant(tailNumberOrRegistrant prefix: String,
+                                            onResult: @escaping ([AutocompleteResult]) -> Void) {
+        if (prefix.isEmpty) {
+            onResult([])
+            return
+        }
+        guard let prefixParam = prefix.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {
+            logger.error("Prefix param was nil?? : \(prefix)")
+            onResult([])
+            return
+        }
+        let urlString = "\(basePath)/any/\(prefixParam)"
+        guard let url = URL(string: urlString) else {
+            logger.error("Unwrapping url was nil?? : \(urlString)")
+            onResult([])
+            return
+        }
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         URLSession.shared.dataTask(with: url) { data, response, error in
                     if let error = error {
                         self.logger.error("Error with autocomplete: \(error.localizedDescription)")
-                        Commons.alert(title: "Error", message: error.localizedDescription)
+                        Commons.alert(title: "Error", message: error.localizedDescription) { }
                     }
                     switch ((response as? HTTPURLResponse)?.statusCode) {
                     case 200:
@@ -67,7 +81,7 @@ class RegistrationService: ObservableObject {
         URLSession.shared.dataTask(with: url) { data, response, error in
                     if let error = error {
                         self.logger.error("Error fetching registration: \(error)")
-                        Commons.alert(title: "Error", message: error.localizedDescription)
+                        Commons.alert(title: "Error", message: error.localizedDescription) { }
                         return
                     }
                     switch ((response as? HTTPURLResponse)?.statusCode) {
