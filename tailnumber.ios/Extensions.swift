@@ -34,6 +34,10 @@ extension String {
 
     // TODO this should be on the server side
     var smartCapitalized: String {
+        if containsLowercase() {
+            return self
+        }
+
         let numberedStreetRegex = try! NSRegularExpression(pattern: "[0-9]+(ST|TH|RD)")
 
         var words : [String] = []

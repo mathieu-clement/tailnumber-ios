@@ -99,7 +99,7 @@ struct RegistrationDetailView: View {
         sections.append(RegistrationDetailSection(label: "Registration", rows: registrationRows))
 
         var aircraftRows: [RegistrationDetailRow] = []
-        aircraftRows.append(RegistrationDetailRow(label: "Manufacturer", value: registration.aircraftReference.manufacturer_))
+        aircraftRows.append(RegistrationDetailRow(label: "Manufacturer", value: registration.aircraftReference.manufacturer?.smartCapitalized))
         aircraftRows.append(RegistrationDetailRow(label: "Model", value: registration.aircraftReference.model))
         aircraftRows.append(RegistrationDetailRow(label: "Year", value: registration.aircraftReference.manufactureYear?.stringValue))
         aircraftRows.append(RegistrationDetailRow(label: "Aircraft type", value: registration.aircraftReference.aircraftType?.fromJavaEnum))
@@ -108,9 +108,57 @@ struct RegistrationDetailView: View {
         if registration.aircraftReference.passengerSeats != 0 {
             aircraftRows.append(RegistrationDetailRow(label: "Passenger seating", value: registration.aircraftReference.passengerSeats?.stringValue))
         }
-        aircraftRows.append(RegistrationDetailRow(label: "Number of engines", value: registration.aircraftReference.engines?.stringValue))
+        if registration.engineReferences == nil {
+            aircraftRows.append(RegistrationDetailRow(label: "Number of engines", value: registration.aircraftReference.engines?.stringValue))
+        }
         aircraftRows.append(RegistrationDetailRow(label: "Weight category", value: registration.aircraftReference.weightCategory?.stringValue))
         sections.append(RegistrationDetailSection(label: "Aircraft", rows: aircraftRows))
+
+        if let engines = registration.engineReferences {
+
+            (0..<engines.count).forEach { i in
+                let engine = engines[i]
+                var engineRows: [RegistrationDetailRow] = []
+                if engine.count != nil && engine.count! > 1 {
+                    engineRows.append(RegistrationDetailRow(label: engines.count > 1 ? "Number this type" : "Number of engines", value: engine.count?.stringValue))
+                }
+                if engine.count == nil && engines.count == 1 && registration.aircraftReference.engines != nil {
+                    engineRows.append(RegistrationDetailRow(label: "Number of engines", value: registration.aircraftReference.engines?.stringValue))
+                }
+                engineRows.append(RegistrationDetailRow(label: "Manufacturer", value: engine.manufacturer.smartCapitalized))
+                engineRows.append(RegistrationDetailRow(label: "Model", value: engine.model))
+                engineRows.append(RegistrationDetailRow(label: "Type", value: engine.engineType?.fromJavaEnum))
+                if let power = engine.power {
+                    var value: Int
+                    var unitAbbrev: String
+                    if power.unit == .WATTS {
+                        value = power.value / 1000
+                        unitAbbrev = "kW"
+                    } else {
+                        value = power.value
+                        unitAbbrev = power.unit.abbreviation
+                    }
+                    engineRows.append(RegistrationDetailRow(label: "Power", value: "\(value.stringValue) \(unitAbbrev)"))
+                }
+                if let thrust = engine.thrust {
+                    var value: Int
+                    var unitAbbrev: String
+                    if thrust.unit == .NEWTONS {
+                        value = thrust.value / 1000
+                        unitAbbrev = "kN"
+                    } else {
+                        value = thrust.value
+                        unitAbbrev = thrust.unit.abbreviation
+                    }
+                    engineRows.append(RegistrationDetailRow(label: "Thrust", value: "\(value.stringValue) \(unitAbbrev)"))
+                }
+
+                let sectionLabel = engines.count == 1
+                        ? (engine.count != nil && engine.count! > 1 ? "Engines" : "Engine")
+                        : "Engine type \(i+1)"
+                sections.append(RegistrationDetailSection(label: sectionLabel, rows: engineRows))
+            }
+        }
     }
 
     private func joinNotNull(_ input: [String?], separator: String = ", ") -> String {

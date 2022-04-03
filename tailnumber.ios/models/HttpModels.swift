@@ -93,7 +93,7 @@ struct Weight: Decodable {
     enum WeightUnit: String, Decodable {
         case KILOGRAMS, US_POUNDS;
 
-        func abbreviation() -> String {
+        var abbreviation: String {
             switch (self) {
             case .KILOGRAMS:
                 return "kg"
@@ -107,7 +107,7 @@ struct Weight: Decodable {
     let unit: WeightUnit
 
     var stringValue : String {
-        "\(value.formattedWithSeparator) \(unit.abbreviation())"
+        "\(value.formattedWithSeparator) \(unit.abbreviation)"
     }
 }
 
@@ -124,7 +124,7 @@ struct WeightCategory: Decodable {
                 return "\(class_) (\(minWeight.stringValue) - \(maxWeight.stringValue))"
             } else {
                 if minWeight.value == 0 {
-                    return "\(class_) (< \((maxWeight.value+1).formattedWithSeparator) \(maxWeight.unit.abbreviation()))"
+                    return "\(class_) (< \((maxWeight.value+1).formattedWithSeparator) \(maxWeight.unit.abbreviation)"
                 } else {
                     return "\(class_) (\(minWeight.value.formattedWithSeparator) - \(maxWeight.stringValue))"
                 }
@@ -138,13 +138,6 @@ struct WeightCategory: Decodable {
 struct AircraftReference: Decodable {
     let aircraftType: String?
     let manufacturer: String?
-    var manufacturer_: String? {
-        if !(manufacturer?.containsLowercase() ?? false) {
-            return manufacturer?.smartCapitalized
-        } else {
-            return manufacturer
-        }
-    }
     let model: String?
     let icaoType: String?
     let serialNumber: String?
@@ -158,9 +151,50 @@ struct AircraftReference: Decodable {
 }
 
 struct EngineReference: Decodable {
-    let count: Int
+    let count: Int?
     let manufacturer: String
     let model: String
+    let engineType: String?
+    let power: Power?
+    let thrust: Thrust?
+}
+
+struct Power: Decodable {
+    let value: Int
+    let unit: PowerUnit
+}
+
+enum PowerUnit: String, Decodable {
+    case SAE_HP, METRIC_HP, WATTS;
+
+    var abbreviation: String {
+        switch (self) {
+        case .SAE_HP:
+            return "hp"
+        case .METRIC_HP:
+            return "hp (metric)"
+        case .WATTS:
+            return "W"
+        }
+    }
+}
+
+struct Thrust: Decodable {
+    let value: Int
+    let unit: ThrustUnit
+}
+
+enum ThrustUnit: String, Decodable {
+    case POUNDS, NEWTONS;
+
+    var abbreviation: String {
+        switch (self) {
+        case .POUNDS:
+            return "lbs"
+        case .NEWTONS:
+            return "N"
+        }
+    }
 }
 
 struct TransponderCode: Decodable {
