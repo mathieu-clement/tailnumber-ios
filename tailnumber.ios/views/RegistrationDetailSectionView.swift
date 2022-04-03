@@ -22,9 +22,7 @@ struct RegistrationDetailSectionView: View {
                                         .font(.subheadline)
                                         .bold()
                                 Spacer()
-                                Text(value)
-                                        .font(.subheadline)
-                                        .multilineTextAlignment(.trailing)
+                                ValueTextView(value: value, emphasize: row.emphasized)
                             }
                             if (i != rows.count - 1) {
                                 Divider()
@@ -34,6 +32,26 @@ struct RegistrationDetailSectionView: View {
                 }
             }
                     .padding([.bottom], 20)
+        }
+    }
+}
+
+struct ValueTextView: View {
+
+    let value: String
+    let emphasize: Bool
+
+    var body: some View {
+        if emphasize {
+            Text(value)
+                    .font(.subheadline)
+                    .bold()
+                    .multilineTextAlignment(.trailing)
+                    .foregroundColor(.red)
+        } else {
+            Text(value)
+                    .font(.subheadline)
+                    .multilineTextAlignment(.trailing)
         }
     }
 }

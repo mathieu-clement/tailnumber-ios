@@ -124,7 +124,7 @@ struct WeightCategory: Decodable {
                 return "\(class_) (\(minWeight.stringValue) - \(maxWeight.stringValue))"
             } else {
                 if minWeight.value == 0 {
-                    return "\(class_) (< \((maxWeight.value+1).formattedWithSeparator) \(maxWeight.unit.abbreviation)"
+                    return "\(class_) (< \((maxWeight.value+1).formattedWithSeparator) \(maxWeight.unit.abbreviation))"
                 } else {
                     return "\(class_) (\(minWeight.value.formattedWithSeparator) - \(maxWeight.stringValue))"
                 }
@@ -137,6 +137,7 @@ struct WeightCategory: Decodable {
 
 struct AircraftReference: Decodable {
     let aircraftType: String?
+    let aircraftCategory: String?
     let manufacturer: String?
     let model: String?
     let icaoType: String?
@@ -145,9 +146,13 @@ struct AircraftReference: Decodable {
     let seats: Int?
     let passengerSeats: Int?
     let weightCategory: WeightCategory?
+    let typeCertificated: Bool?
+    let cruisingSpeed: Speed?
     let maxTakeOffMass: Weight?
     let manufactureYear: Int?
     let transponderCode: TransponderCode?
+    let kitManufacturerName: String?
+    let kitModelName: String?
 }
 
 struct EngineReference: Decodable {
@@ -157,6 +162,26 @@ struct EngineReference: Decodable {
     let engineType: String?
     let power: Power?
     let thrust: Thrust?
+}
+
+struct Speed: Decodable {
+    let value: Int
+    let unit: SpeedUnit
+}
+
+enum SpeedUnit: String, Decodable {
+    case KT, MPH, KPH;
+
+    var abbreviation: String {
+        switch (self) {
+        case .KT:
+            return "kt"
+        case .MPH:
+            return "mph"
+        case .KPH:
+            return "kph"
+        }
+    }
 }
 
 struct Power: Decodable {
@@ -231,8 +256,11 @@ struct Registration: Decodable {
     let owner: String?
     let `operator`: String?
     let registrant: Registrant?
+    let registrantType: String?
     let certificateIssueDate: Date?
     let lastActivityDate: Date?
     let expirationDate: Date?
     let airworthiness: Airworthiness?
+    let fractionalOwnership: Bool?
+    let coOwners: [String]?
 }

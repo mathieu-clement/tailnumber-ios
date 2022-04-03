@@ -14,4 +14,5 @@ struct RegistrationDetailRow: Identifiable, Hashable {
     let id = UUID()
     let label: String
     let value: String?
+    var emphasized: Bool = false
 }

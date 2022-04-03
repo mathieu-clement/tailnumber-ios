@@ -4,10 +4,11 @@
 
 import Foundation
 
-protocol HasApply { }
+protocol HasApply {
+}
 
 extension HasApply {
-    func apply(closure:(Self) -> ()) -> Self {
+    func apply(closure: (Self) -> ()) -> Self {
         closure(self)
         return self
     }
@@ -40,13 +41,13 @@ extension String {
 
         let numberedStreetRegex = try! NSRegularExpression(pattern: "[0-9]+(ST|TH|RD)")
 
-        var words : [String] = []
+        var words: [String] = []
         self.components(separatedBy: " ").forEach { word in
             if (word == "DE" || word == "DU" || numberedStreetRegex.matches(word)) {
                 words.append(word.lowercased())
             } else if (word == "BOX" || word == "INC" || word == "RD" || word == "ST" || word == "WY" || word == "LN"
                     || word == "CO" || word == "STE" || word == "APT" || word == "DR" || word == "CIR" || word == "HWY"
-                    || word == "MT" || word == "CT"
+                    || word == "MT" || word == "CT" || word == "PL"
                     || (word.count > 2 && word != "LLC" && word != "II" && word != "III")) {
                 words.append(word.lowercased().capitalized)
             } else {
@@ -58,8 +59,17 @@ extension String {
 
     var fromJavaEnum: String {
         // Capitalize first word only
-        var words = self.components(separatedBy: "_").map { s in s.lowercased() }
-        words[0] = words[0].capitalized
+        var words = self.components(separatedBy: "_").map { s in
+            s.lowercased()
+        }
+
+        switch (words[0]) {
+            case "llc":
+                words[0] = "LLC"
+            default:
+                words[0] = words[0].capitalized
+        }
+
         return words.joined(separator: " ")
     }
 }
@@ -70,7 +80,8 @@ extension Int {
     }
 }
 
-extension DateFormatter : HasApply { }
+extension DateFormatter: HasApply {
+}
 
 private var usDateFormatter = DateFormatter().apply { formatter in
     formatter.dateFormat = "MM/dd/yyyy"
@@ -83,16 +94,22 @@ extension Date {
     }
 }
 
-extension NumberFormatter : HasApply { }
+extension NumberFormatter: HasApply {
+}
+
 private let numberFormatter = NumberFormatter().apply { formatter in
     formatter.numberStyle = .decimal
     formatter.groupingSeparator = " "
 }
+
 extension Formatter {
     static let withSeparator: NumberFormatter = {
         numberFormatter
     }()
 }
+
 extension Numeric {
-    var formattedWithSeparator: String { Formatter.withSeparator.string(for: self) ?? "" }
+    var formattedWithSeparator: String {
+        Formatter.withSeparator.string(for: self) ?? ""
+    }
 }
