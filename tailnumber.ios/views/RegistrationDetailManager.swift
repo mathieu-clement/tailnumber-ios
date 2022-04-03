@@ -91,6 +91,10 @@ class RegistrationDetailManager {
             aircraftRows.append(RegistrationDetailRow(label: "Cruising speed", value: "\(speed.value) \(speed.unit.abbreviation)"))
         }
         aircraftRows.append(RegistrationDetailRow(label: "Serial number", value: registration.aircraftReference.serialNumber))
+        if let code = registration.aircraftReference.transponderCode {
+            aircraftRows.append(RegistrationDetailRow(label: "Transponder code", value:
+            "\(code.code) (dec)\n\(code.octal) (oct)\n\(code.hex) (hex)"))
+        }
         aircraftRows.append(RegistrationDetailRow(label: "Weight category", value: registration.aircraftReference.weightCategory?.stringValue))
 
         return RegistrationDetailSection(label: "Aircraft", rows: aircraftRows)
@@ -138,7 +142,7 @@ class RegistrationDetailManager {
 
                 let sectionLabel = engines.count == 1
                         ? (engine.count != nil && engine.count! > 1 ? "Engines" : "Engine")
-                        : "Engine type \(i+1)"
+                        : "Engine \(i+1)"
                 results.append(RegistrationDetailSection(label: sectionLabel, rows: engineRows))
             }
         }
