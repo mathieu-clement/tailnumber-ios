@@ -7,6 +7,7 @@ import SwiftUI
 
 struct RegistrationDetailSection: Identifiable {
     let label: String
+    let image: String
     let rows: [RegistrationDetailRow]
     var id : String { label }
 }

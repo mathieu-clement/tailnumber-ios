@@ -33,27 +33,31 @@ struct RegistrationDetailView: View {
             VStack {
                 Picker(selection: $selectedSection, label: Text("Section:")) {
                     ForEach(0..<sections.count, id: \.self) { i in
-                        Text(sections[i].label)
+//                        Text(sections[i].label)
+                        Image(systemName: sections[i].image).tag(sections[i].label)
                     }
                 }
                         .pickerStyle(.segmented)
-                        .padding()
+                        .padding([.leading, .trailing, .bottom])
 
                 if !sections.isEmpty {
-                    let section = sections[selectedSection]
-                    RegistrationDetailSectionView(label: section.label, rows: section.rows)
-                    if let lastUpdate = lastUpdate {
-                        Text("Last update: \(lastUpdate.userLocaleFormat)").font(.caption)
-                    }
-                    if let country = registrationResult?.registration.registrationId.country {
-                        switch(country) {
-                        case .CH:
-                            Text("Source: FOCA (Switzerland)").font(.caption)
-                        case .US:
-                            Text("Source: FAA database").font(.caption)
+                    ScrollView {
+                        let section = sections[selectedSection]
+                        Text(section.label).font(.headline)
+                                .padding([.bottom])
+                        RegistrationDetailSectionView(label: section.label, rows: section.rows)
+                        if let lastUpdate = lastUpdate {
+                            Text("Last update: \(lastUpdate.userLocaleFormat)").font(.caption)
+                        }
+                        if let country = registrationResult?.registration.registrationId.country {
+                            switch (country) {
+                            case .CH:
+                                Text("Source: FOCA (Switzerland)").font(.caption)
+                            case .US:
+                                Text("Source: FAA database").font(.caption)
+                            }
                         }
                     }
-                    Spacer()
                 }
             }
                     .padding()
@@ -70,6 +74,7 @@ struct RegistrationDetailView: View {
         sections.append(registrationDetailManager.registrationSection(forRegistrationResult: registrationResult!))
         sections.append(registrationDetailManager.aircraftSection(forRegistration: registration))
         sections += registrationDetailManager.engineSections(forRegistration: registration)
+        sections += registrationDetailManager.propellerSections(forRegistration: registration)
     }
 
     private func fetchRegistration() {

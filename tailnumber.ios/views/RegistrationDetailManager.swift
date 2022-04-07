@@ -69,7 +69,7 @@ class RegistrationDetailManager {
 
 //        registrationRows.append(RegistrationDetailRow(label: "Data fetched", value: registrationResult.lastUpdate.usFormat))
 
-        return RegistrationDetailSection(label: "Registration", rows: registrationRows)
+        return RegistrationDetailSection(label: "Registration", image: "doc.plaintext", rows: registrationRows)
     }
 
     private func toString(address: Address) -> String {
@@ -124,10 +124,11 @@ class RegistrationDetailManager {
         }
         aircraftRows.append(RegistrationDetailRow(label: "Legal basis", value: registration.aircraftReference.legalBasis))
 
-        return RegistrationDetailSection(label: "Aircraft", rows: aircraftRows)
+        return RegistrationDetailSection(label: "Aircraft", image: "airplane", rows: aircraftRows)
     }
 
     func engineSections(forRegistration registration: Registration) -> [RegistrationDetailSection] {
+        // TODO transform to have two paragraphs in the same section instead of two sections
         var results: [RegistrationDetailSection] = []
         if let engines = registration.engineReferences {
             (0..<engines.count).forEach { i in
@@ -170,7 +171,30 @@ class RegistrationDetailManager {
                 let sectionLabel = engines.count == 1
                         ? (engine.count != nil && engine.count! > 1 ? "Engines" : "Engine")
                         : "Engine \(i + 1)"
-                results.append(RegistrationDetailSection(label: sectionLabel, rows: engineRows))
+                results.append(RegistrationDetailSection(label: sectionLabel, image: "bolt.fill", rows: engineRows))
+            }
+        }
+
+        return results
+    }
+
+    func propellerSections(forRegistration registration: Registration) -> [RegistrationDetailSection] {
+        // TODO transform to have two paragraphs in the same section instead of two sections
+        var results: [RegistrationDetailSection] = []
+        if let propellers = registration.propellerReferences {
+            (0..<propellers.count).forEach { i in
+                let propeller = propellers[i]
+                var engineRows: [RegistrationDetailRow] = []
+                if propeller.count != nil && propeller.count! > 1 {
+                    engineRows.append(RegistrationDetailRow(label: propellers.count > 1 ? "Number this type" : "Number of propellers", value: propeller.count?.stringValue))
+                }
+                engineRows.append(RegistrationDetailRow(label: "Manufacturer", value: propeller.manufacturer.smartCapitalized))
+                engineRows.append(RegistrationDetailRow(label: "Model", value: propeller.model))
+
+                let sectionLabel = propellers.count == 1
+                        ? (propeller.count != nil && propeller.count! > 1 ? "Propellers" : "Propeller")
+                        : "Propeller \(i + 1)"
+                results.append(RegistrationDetailSection(label: sectionLabel, image: "line.diagonal", rows: engineRows))
             }
         }
 
