@@ -16,6 +16,7 @@
 		E29B31D5FA6C77A4461F6AAB /* RegistrationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29B38D992EECBBB1433B54A /* RegistrationDetailView.swift */; };
 		E29B32D9884009FC3D9948F7 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = E29B336C7C9C10E161D9380B /* .gitignore */; };
 		E29B32F38D332059B55F05DC /* RegistrationDetailManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29B360213FC321AF50360F0 /* RegistrationDetailManager.swift */; };
+		E29B3453D288C5497E031DFC /* LocalizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29B36047DEA74182B69E9BD /* LocalizationManager.swift */; };
 		E29B351EEAE5379B571B4813 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29B35CC1DFA51EB562F820A /* SearchView.swift */; };
 		E29B364AB76740F9D93956A8 /* HttpModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29B33F99E20BC6B9A4F7B1E /* HttpModels.swift */; };
 		E29B37C94A0F7685134F7BD5 /* RegistrationDetailSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29B393AF40E50AD23951FC1 /* RegistrationDetailSectionView.swift */; };
@@ -41,6 +42,7 @@
 		E29B357AC2E8178404A1476F /* LocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		E29B35CC1DFA51EB562F820A /* SearchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		E29B360213FC321AF50360F0 /* RegistrationDetailManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegistrationDetailManager.swift; sourceTree = "<group>"; };
+		E29B36047DEA74182B69E9BD /* LocalizationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalizationManager.swift; sourceTree = "<group>"; };
 		E29B38D992EECBBB1433B54A /* RegistrationDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegistrationDetailView.swift; sourceTree = "<group>"; };
 		E29B393AF40E50AD23951FC1 /* RegistrationDetailSectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegistrationDetailSectionView.swift; sourceTree = "<group>"; };
 		E500AFDC988F429F4F8AC447 /* Pods-tailnumber.ios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tailnumber.ios.debug.xcconfig"; path = "Target Support Files/Pods-tailnumber.ios/Pods-tailnumber.ios.debug.xcconfig"; sourceTree = "<group>"; };
@@ -134,6 +136,7 @@
 			children = (
 				E29B3569073556D728CA859D /* RegistrationService.swift */,
 				E29B357AC2E8178404A1476F /* LocationManager.swift */,
+				E29B36047DEA74182B69E9BD /* LocalizationManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -263,6 +266,7 @@
 				E29B3CD5DCDAC7E31E89EB0D /* Commons.swift in Sources */,
 				E29B32F38D332059B55F05DC /* RegistrationDetailManager.swift in Sources */,
 				E29B396F99D4AFF506CBAC6D /* LocationManager.swift in Sources */,
+				E29B3453D288C5497E031DFC /* LocalizationManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

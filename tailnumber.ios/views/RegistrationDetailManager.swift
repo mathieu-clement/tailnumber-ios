@@ -29,10 +29,14 @@ class RegistrationDetailManager {
                     menuType: .address))
         }
         registrationRows.append(RegistrationDetailRow(label: registration.owner == registration.operator ? "Registrant" : "Owner",
-                value: combineNameAndAddress(fromRegistrant: registration.owner)))
+                value: combineNameAndAddress(fromRegistrant: registration.owner)
+//                menuType: .address // TODO enable just for the address part
+        ))
         if registration.owner != registration.operator {
             registrationRows.append(RegistrationDetailRow(label: "Operator",
-                    value: combineNameAndAddress(fromRegistrant: registration.operator)))
+                    value: combineNameAndAddress(fromRegistrant: registration.operator)
+                    //                menuType: .address // TODO enable just for the address part
+            ))
         }
         if registration.fractionalOwnership == true {
             registrationRows.append(RegistrationDetailRow(label: "Fractional ownership", value: "Yes"))
@@ -85,8 +89,8 @@ class RegistrationDetailManager {
     func aircraftSection(forRegistration registration: Registration) -> RegistrationDetailSection {
         var aircraftRows: [RegistrationDetailRow] = []
         aircraftRows.append(RegistrationDetailRow(label: "Manufacturer", value: registration.aircraftReference.manufacturer?.smartCapitalized))
-        aircraftRows.append(RegistrationDetailRow(label: "Model", value: registration.aircraftReference.model))
         aircraftRows.append(RegistrationDetailRow(label: "Marketing designation", value: registration.aircraftReference.marketingDesignation))
+        aircraftRows.append(RegistrationDetailRow(label: "Model", value: registration.aircraftReference.model))
         aircraftRows.append(RegistrationDetailRow(label: "Kit manufacturer", value: registration.aircraftReference.kitManufacturerName?.smartCapitalized))
         aircraftRows.append(RegistrationDetailRow(label: "Kit model", value: registration.aircraftReference.kitModelName))
         aircraftRows.append(RegistrationDetailRow(label: "ICAO type", value: registration.aircraftReference.icaoType))

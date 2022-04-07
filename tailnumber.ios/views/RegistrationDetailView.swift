@@ -18,13 +18,7 @@ struct RegistrationDetailView: View {
     @State private var lastUpdate: Date? = nil
     @State private var selectedSection = 0
     @Environment(\.presentationMode) var presentation
-    private static var loadingTexts = [
-        "Priming the engine",
-        "Fetching data",
-        "Spooling up the engines",
-        "Tuning in the frequency"
-    ]
-    private var loadingText : String = loadingTexts[Int.random(in: 0..<loadingTexts.count)]
+    private var loadingText : String = LocalizationManager().randomLoadingText()
 
     init(forTailnumber: String) {
         tailnumber = forTailnumber
@@ -32,7 +26,7 @@ struct RegistrationDetailView: View {
 
     var body: some View {
         if (registrationResult == nil) {
-            Text("\(loadingText)...").onAppear {
+            ProgressView("\(loadingText)...").onAppear {
                 fetchRegistration()
             }
         } else {
@@ -100,8 +94,8 @@ struct RegistrationDetailView: View {
                         title = "No records found"
                         message = "There were no records matching the query."
                     case .RegistrationNotFound:
-                        title = "Registration not found"
-                        message = "Verify the tail number is correct and starts with the country code (e.g. \"N\")"
+                        title = "\"\(tailnumber)\" not found"
+                        message = "Did you include the country code (e.g. \"N\", \"HB\")?"
                     default:
                         title = "Unknown error"
                         message = "An unknown error occurred. We are investigating it."
