@@ -50,14 +50,17 @@ class RegistrationService: ObservableObject {
 
             URLSession.shared.dataTask(with: url) { data, response, error in
                         if let error = error {
-                            self.logger.error("Error with autocomplete: \(error.localizedDescription)")
+                            self.logger.error("Error with autocomplete: \(error)")
                             Commons.alert(title: "Error", message: error.localizedDescription) { }
                         }
                         switch ((response as? HTTPURLResponse)?.statusCode) {
                         case 200:
                             if let data = data {
-                                let results = self.decodeAutocompleteResults(fromJson: data,
+                                let results = decodeAutocompleteResults(fromJson: data,
                                         onFailure: { jsonError in onResult([]) } )
+                                if results.isEmpty {
+                                    self.logger.warning("Something must have gone wrong. 200 status but empty results.")
+                                }
                                 onResult(results)
                             }
 
@@ -74,9 +77,12 @@ class RegistrationService: ObservableObject {
     }
 
     func fetchRegistrationAsync(forTailNumber tailnumber: String,
-                                onSuccess: @escaping (Registration) -> Void,
+                                onSuccess: @escaping (RegistrationResult) -> Void,
                                 onFailure: @escaping (RegistrationServiceError) -> Void) {
-        let url = URL(string: "\(basePath)/\(tailnumber)")!
+        let urlOpt = URL(string: "\(basePath)/\(tailnumber)")
+        guard let url = urlOpt else {
+            return
+        }
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
@@ -89,12 +95,12 @@ class RegistrationService: ObservableObject {
                     switch ((response as? HTTPURLResponse)?.statusCode) {
                     case 200:
                         if let data = data {
-                            if let registration = self.decodeRegistration(fromJson: data, onFailure: { jsonError in
+                            if let registrationResult = self.decodeRegistrationResult(fromJson: data, onFailure: { jsonError in
                                 self.logger.error("JSON error: \(jsonError)")
                                 onFailure(jsonError)
                             }
                             ) {
-                                onSuccess(registration)
+                                onSuccess(registrationResult)
                             }
                         }
 
@@ -109,9 +115,9 @@ class RegistrationService: ObservableObject {
                 .resume()
     }
 
-    private func decodeRegistration(fromJson data: Data, onFailure: @escaping (RegistrationServiceError) -> Void) -> Registration? {
+    private func decodeRegistrationResult(fromJson data: Data, onFailure: @escaping (RegistrationServiceError) -> Void) -> RegistrationResult? {
         do {
-            return try jsonDecoder.decode(Registration.self, from: data)
+            return try jsonDecoder.decode(RegistrationResult.self, from: data)
         } catch {
             // TODO handle errors better
             onFailure(RegistrationServiceError.JsonError(error))
@@ -124,6 +130,7 @@ class RegistrationService: ObservableObject {
             return try jsonDecoder.decode([AutocompleteResult].self, from: data)
         } catch {
             // TODO handle errors better
+            logger.error("Error decoding autocomplete result: \(error)")
             onFailure(RegistrationServiceError.JsonError(error))
             return []
         }

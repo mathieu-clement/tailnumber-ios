@@ -36,16 +36,16 @@ struct AutocompleteResult: Decodable, Identifiable, Hashable {
 
     var registrantNameOrOperator: String? {
         get {
-            registrant?.name.smartCapitalized ?? operatorName
+            registrant?.name?.smartCapitalized ?? operatorName
         }
     }
 
     var operatorName: String? {
-        guard `operator` != nil else {
+        guard `operator`?.name != nil else {
             return nil
         }
 
-        let parts = `operator`!.components(separatedBy: ", ")
+        let parts = `operator`!.name!.components(separatedBy: ", ")
         if parts.count == 1 || parts[1].containsDigits() || parts[1].contains("c/o") {
             return parts[0]
         } else {
@@ -54,22 +54,22 @@ struct AutocompleteResult: Decodable, Identifiable, Hashable {
     }
 
     var aircraftName: String? {
-        var result: String = ""
-        var hasModel = false
+        var components: [String] = []
+
         if let model = model {
-            result += model
-            hasModel = true
+            components.append(model)
         }
         if let manufacturer = manufacturer {
-            if (hasModel) {
-                result += ", "
-            }
-            result += manufacturer.smartCapitalized
+            components.append(manufacturer.smartCapitalized)
         }
-        if (result.isEmpty) {
+        if let year = year {
+            components.append(year.stringValue)
+        }
+
+        if components.isEmpty {
             return nil
         } else {
-            return result
+            return components.joined(separator: ", ")
         }
     }
 
@@ -77,8 +77,9 @@ struct AutocompleteResult: Decodable, Identifiable, Hashable {
 
     let manufacturer: String?
     let model: String?
+    let year: Int?
     let registrant: Registrant?
-    let `operator`: String?
+    let `operator`: Registrant?
 
     static func ==(lhs: AutocompleteResult, rhs: AutocompleteResult) -> Bool {
         lhs.id == rhs.id
@@ -140,6 +141,7 @@ struct AircraftReference: Decodable {
     let aircraftCategory: String?
     let manufacturer: String?
     let model: String?
+    let marketingDesignation: String?
     let icaoType: String?
     let serialNumber: String?
     let engines: Int?
@@ -153,6 +155,11 @@ struct AircraftReference: Decodable {
     let transponderCode: TransponderCode?
     let kitManufacturerName: String?
     let kitModelName: String?
+    let certificationBasis: String?
+    let minCrew: Int?
+    let noiseClass: String?
+    let noiseLevel: Double?
+    let legalBasis: String?
 }
 
 struct EngineReference: Decodable {
@@ -162,6 +169,12 @@ struct EngineReference: Decodable {
     let engineType: String?
     let power: Power?
     let thrust: Thrust?
+}
+
+struct PropellerReference: Decodable {
+    let count: Int?
+    let manufacturer: String
+    let model: String
 }
 
 struct Speed: Decodable {
@@ -237,9 +250,19 @@ struct Address: Decodable {
     let country: String?
 }
 
-struct Registrant: Decodable {
-    let name: String
+struct Registrant: Decodable, Equatable {
+    static func ==(lhs: Registrant, rhs: Registrant) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    let name: String?
     let address: Address?
+    let id: Int64
+
+    enum CodingKeys: String, CodingKey {
+        case id = "uniqueId"
+        case name, address
+    }
 }
 
 struct Airworthiness: Decodable {
@@ -253,8 +276,9 @@ struct Registration: Decodable {
     let registrationId: RegistrationId
     let aircraftReference: AircraftReference
     let engineReferences: [EngineReference]?
-    let owner: String?
-    let `operator`: String?
+    let propellerReferences: [PropellerReference]?
+    let owner: Registrant?
+    let `operator`: Registrant?
     let registrant: Registrant?
     let registrantType: String?
     let certificateIssueDate: Date?
@@ -263,4 +287,9 @@ struct Registration: Decodable {
     let airworthiness: Airworthiness?
     let fractionalOwnership: Bool?
     let coOwners: [String]?
+}
+
+struct RegistrationResult: Decodable {
+    let lastUpdate: Date
+    let registration: Registration
 }

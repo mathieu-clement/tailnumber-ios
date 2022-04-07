@@ -13,8 +13,9 @@ struct RegistrationDetailView: View {
 
     private let tailnumber: String
 
-    @State private var registration: Registration? = nil
+    @State private var registrationResult: RegistrationResult? = nil
     @State private var sections: [RegistrationDetailSection] = []
+    @State private var lastUpdate: Date? = nil
     @State private var selectedSection = 0
     @Environment(\.presentationMode) var presentation
     private static var loadingTexts = [
@@ -30,7 +31,7 @@ struct RegistrationDetailView: View {
     }
 
     var body: some View {
-        if (registration == nil) {
+        if (registrationResult == nil) {
             Text("\(loadingText)...").onAppear {
                 fetchRegistration()
             }
@@ -47,21 +48,32 @@ struct RegistrationDetailView: View {
                 if !sections.isEmpty {
                     let section = sections[selectedSection]
                     RegistrationDetailSectionView(label: section.label, rows: section.rows)
+                    if let lastUpdate = lastUpdate {
+                        Text("Last update: \(lastUpdate.userLocaleFormat)").font(.caption)
+                    }
+                    if let country = registrationResult?.registration.registrationId.country {
+                        switch(country) {
+                        case .CH:
+                            Text("Source: FOCA (Switzerland)").font(.caption)
+                        case .US:
+                            Text("Source: FAA database").font(.caption)
+                        }
+                    }
                     Spacer()
                 }
             }
                     .padding()
-                    .navigationTitle(registration?.registrationId.id ?? tailnumber)
+                    .navigationTitle(registrationResult?.registration.registrationId.id ?? tailnumber)
         }
     }
 
     private func createTable() {
-        guard let registration = registration else {
+        guard let registration = registrationResult?.registration else {
             sections = []
             return
         }
 
-        sections.append(registrationDetailManager.registrationSection(forRegistration: registration))
+        sections.append(registrationDetailManager.registrationSection(forRegistrationResult: registrationResult!))
         sections.append(registrationDetailManager.aircraftSection(forRegistration: registration))
         sections += registrationDetailManager.engineSections(forRegistration: registration)
     }
@@ -70,9 +82,10 @@ struct RegistrationDetailView: View {
         logger.debug("Fetching registration async for \(tailnumber)...")
 
         registrationService.fetchRegistrationAsync(forTailNumber: tailnumber,
-                onSuccess: { reg in
+                onSuccess: { regResult in
                     DispatchQueue.main.async {
-                        self.registration = reg
+                        self.registrationResult = regResult
+                        self.lastUpdate = regResult.lastUpdate
                         createTable()
                     }
                 },

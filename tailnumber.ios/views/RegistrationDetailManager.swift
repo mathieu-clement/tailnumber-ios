@@ -6,7 +6,8 @@ import Foundation
 
 class RegistrationDetailManager {
 
-    func registrationSection(forRegistration registration: Registration) -> RegistrationDetailSection {
+    func registrationSection(forRegistrationResult registrationResult: RegistrationResult) -> RegistrationDetailSection {
+        let registration = registrationResult.registration
         var registrationRows: [RegistrationDetailRow] = []
         if registration.status != "VALID" {
             registrationRows.append(RegistrationDetailRow(label: "Status",
@@ -14,28 +15,24 @@ class RegistrationDetailManager {
                     emphasized: true))
         }
         registrationRows.append(RegistrationDetailRow(label: "Name", value:
-            registration.registrant?.name != "SALE REPORTED" && registration.registrant?.name != "REGISTRATION PENDING"
-                    ? registration.registrant?.name.smartCapitalized
-                    : "Unknown"))
-        if registration.registrant?.name.hasSuffix("LLC") == false {
+        registration.registrant?.name != "SALE REPORTED" && registration.registrant?.name != "REGISTRATION PENDING"
+                ? registration.registrant?.name?.smartCapitalized
+                : "Unknown"))
+        if registration.registrant?.name?.hasSuffix("LLC") == false {
             registrationRows.append(RegistrationDetailRow(label: "Registrant type", value: registration.registrantType?.fromJavaEnum))
         }
         if let address = registration.registrant?.address {
-            let cityAndState: String = joinNotNull([address.city?.smartCapitalized, address.state], separator: " ")
-            let cityAndStateAndZip: String = joinNotNull([cityAndState, address.zipCode])
-            let fields = [address.street1?.smartCapitalized, address.street2?.smartCapitalized,
-                          cityAndStateAndZip, address.country]
-            let addressString = joinNotNull(fields, separator: "\n")
+            let addressString = toString(address: address)
             registrationRows.append(RegistrationDetailRow(
                     label: "Address",
                     value: addressString,
                     menuType: .address))
         }
-        if (registration.owner == registration.operator) {
-            registrationRows.append(RegistrationDetailRow(label: "Registrant", value: replaceCommasWithNewlines(registration.owner)))
-        } else {
-            registrationRows.append(RegistrationDetailRow(label: "Owner", value: replaceCommasWithNewlines(registration.owner)))
-            registrationRows.append(RegistrationDetailRow(label: "Operator", value: replaceCommasWithNewlines(registration.operator)))
+        registrationRows.append(RegistrationDetailRow(label: registration.owner == registration.operator ? "Registrant" : "Owner",
+                value: combineNameAndAddress(fromRegistrant: registration.owner)))
+        if registration.owner != registration.operator {
+            registrationRows.append(RegistrationDetailRow(label: "Operator",
+                    value: combineNameAndAddress(fromRegistrant: registration.operator)))
         }
         if registration.fractionalOwnership == true {
             registrationRows.append(RegistrationDetailRow(label: "Fractional ownership", value: "Yes"))
@@ -43,7 +40,9 @@ class RegistrationDetailManager {
         if let coOwners = registration.coOwners {
             registrationRows.append(RegistrationDetailRow(label: "Co-owners",
                     value: coOwners
-                            .map { s in s.smartCapitalized }
+                            .map { s in
+                                s.smartCapitalized
+                            }
                             .joined(separator: ", ")))
         }
 
@@ -58,19 +57,36 @@ class RegistrationDetailManager {
                     value: joinNotNull(airworthiness)))
         }
 
-        registrationRows.append(RegistrationDetailRow(label: "Airworthiness date", value: registration.airworthiness?.airworthinessDate?.usFormat))
-        registrationRows.append(RegistrationDetailRow(label: "Issue date", value: registration.certificateIssueDate?.usFormat))
-        registrationRows.append(RegistrationDetailRow(label: "Expiration", value: registration.expirationDate?.usFormat))
+        registrationRows.append(RegistrationDetailRow(label: "Airworthiness date", value: registration.airworthiness?.airworthinessDate?.userLocaleFormat))
+        registrationRows.append(RegistrationDetailRow(label: "Issue date", value: registration.certificateIssueDate?.userLocaleFormat))
+        registrationRows.append(RegistrationDetailRow(label: "Expiration", value: registration.expirationDate?.userLocaleFormat))
 //        registrationRows.append(RegistrationDetailRow(label: "Last activity", value: registration.lastActivityDate?.usFormat))
 //        registrationRows.append(RegistrationDetailRow(label: "Country", value: registration.registrationId.country.fullName))
 
+//        registrationRows.append(RegistrationDetailRow(label: "Data fetched", value: registrationResult.lastUpdate.usFormat))
+
         return RegistrationDetailSection(label: "Registration", rows: registrationRows)
+    }
+
+    private func toString(address: Address) -> String {
+        let cityAndState: String = joinNotNull([address.city?.smartCapitalized, address.state], separator: " ")
+        let cityAndStateAndZip: String =
+                (address.country != nil && address.country == "Switzerland")
+                        ? "\(address.zipCode != nil ? address.zipCode! : "") \(cityAndState)"
+                        : joinNotNull([cityAndState, address.zipCode])
+        let fields = [address.street1?.smartCapitalized,
+                      address.street2?.smartCapitalized,
+                      cityAndStateAndZip,
+                      address.country]
+        let addressString = joinNotNull(fields, separator: "\n")
+        return addressString
     }
 
     func aircraftSection(forRegistration registration: Registration) -> RegistrationDetailSection {
         var aircraftRows: [RegistrationDetailRow] = []
         aircraftRows.append(RegistrationDetailRow(label: "Manufacturer", value: registration.aircraftReference.manufacturer?.smartCapitalized))
         aircraftRows.append(RegistrationDetailRow(label: "Model", value: registration.aircraftReference.model))
+        aircraftRows.append(RegistrationDetailRow(label: "Marketing designation", value: registration.aircraftReference.marketingDesignation))
         aircraftRows.append(RegistrationDetailRow(label: "Kit manufacturer", value: registration.aircraftReference.kitManufacturerName?.smartCapitalized))
         aircraftRows.append(RegistrationDetailRow(label: "Kit model", value: registration.aircraftReference.kitModelName))
         aircraftRows.append(RegistrationDetailRow(label: "ICAO type", value: registration.aircraftReference.icaoType))
@@ -96,6 +112,13 @@ class RegistrationDetailManager {
             "\(code.code) (dec)\n\(code.octal) (oct)\n\(code.hex) (hex)"))
         }
         aircraftRows.append(RegistrationDetailRow(label: "Weight category", value: registration.aircraftReference.weightCategory?.stringValue))
+        aircraftRows.append(RegistrationDetailRow(label: "Certification basis", value: registration.aircraftReference.certificationBasis))
+        aircraftRows.append(RegistrationDetailRow(label: "Minimum crew", value: registration.aircraftReference.minCrew?.stringValue))
+        aircraftRows.append(RegistrationDetailRow(label: "Noise class", value: registration.aircraftReference.noiseClass))
+        if let noiseLevel = registration.aircraftReference.noiseLevel {
+            aircraftRows.append(RegistrationDetailRow(label: "Noise level", value: "\(noiseLevel) dB(A)"))
+        }
+        aircraftRows.append(RegistrationDetailRow(label: "Legal basis", value: registration.aircraftReference.legalBasis))
 
         return RegistrationDetailSection(label: "Aircraft", rows: aircraftRows)
     }
@@ -142,7 +165,7 @@ class RegistrationDetailManager {
 
                 let sectionLabel = engines.count == 1
                         ? (engine.count != nil && engine.count! > 1 ? "Engines" : "Engine")
-                        : "Engine \(i+1)"
+                        : "Engine \(i + 1)"
                 results.append(RegistrationDetailSection(label: sectionLabel, rows: engineRows))
             }
         }
@@ -156,6 +179,21 @@ class RegistrationDetailManager {
                     s != nil
                 } as! [String])
                 .joined(separator: separator)
+    }
+
+    private func combineNameAndAddress(fromRegistrant registrant: Registrant?) -> String? {
+        guard registrant != nil else {
+            return nil
+        }
+
+        var components: [String] = []
+        if let name = registrant?.name {
+            components.append(name)
+        }
+        if let address = registrant?.address {
+            components.append(toString(address: address))
+        }
+        return components.isEmpty ? nil : components.joined(separator: "\n")
     }
 
     private func replaceCommasWithNewlines(_ input: String?) -> String? {

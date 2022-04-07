@@ -15,7 +15,7 @@ class LocationManager: NSObject, ObservableObject {
     func openMapWithAddress (_ locationString: String) {
         geocoder.geocodeAddressString(locationString) { placemarks, error in
             if let error = error {
-                self.logger.error("\(error.localizedDescription)")
+                self.logger.error("\(error)")
             }
 
             guard let placemark = placemarks?.first else {

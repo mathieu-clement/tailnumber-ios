@@ -42,7 +42,7 @@ struct RegistrationDetailSectionView: View {
                                                         presentation.wrappedValue.dismiss()
                                                         searchText.value = value
                                                     } label: {
-                                                        Label("Registrations at this address", systemImage: "magnifyingglass.circle")
+                                                        Label("Registrations at this address", systemImage: "doc.text.magnifyingglass")
                                                     }*/
                                                 }
                                             }

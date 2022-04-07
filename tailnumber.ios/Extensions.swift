@@ -83,14 +83,13 @@ extension Int {
 extension DateFormatter: HasApply {
 }
 
-private var usDateFormatter = DateFormatter().apply { formatter in
-    formatter.dateFormat = "MM/dd/yyyy"
-    formatter.locale = Locale(identifier: "en_US")
+private var userLocaleDateFormatter = DateFormatter().apply { formatter in
+    formatter.setLocalizedDateFormatFromTemplate("dd/MM/yyyy")
 }
 
 extension Date {
-    var usFormat: String {
-        usDateFormatter.string(from: self)
+    var userLocaleFormat: String {
+        userLocaleDateFormatter.string(from: self)
     }
 }
 

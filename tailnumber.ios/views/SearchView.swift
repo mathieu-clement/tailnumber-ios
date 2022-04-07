@@ -69,6 +69,7 @@ struct SearchView: View {
             }
         } // NavigationView
                 .searchable(text: searchTextBinding, prompt: "Registration, Owner, Address")
+                .disableAutocorrection(true)
                 .onSubmit(of: .search) {
                     navigateOnSubmitEnabled = true
                     isSearching = false
