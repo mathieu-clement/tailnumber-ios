@@ -9,7 +9,7 @@ class RegistrationDetailManager {
     func registrationSection(forRegistrationResult registrationResult: RegistrationResult) -> RegistrationDetailSection {
         let registration = registrationResult.registration
         var registrationRows: [RegistrationDetailRow] = []
-        if registration.status != "VALID" {
+        if registration.status != "VALID" && registration.status != "REGISTERED" {
             registrationRows.append(RegistrationDetailRow(label: "Status",
                     value: registration.status?.fromJavaEnum,
                     emphasized: true))
@@ -100,6 +100,7 @@ class RegistrationDetailManager {
         if registration.aircraftReference.passengerSeats != 0 {
             aircraftRows.append(RegistrationDetailRow(label: "Passenger seating", value: registration.aircraftReference.passengerSeats?.stringValue))
         }
+        aircraftRows.append(RegistrationDetailRow(label: "Minimum crew", value: registration.aircraftReference.minCrew?.stringValue))
         if registration.engineReferences == nil {
             aircraftRows.append(RegistrationDetailRow(label: "Number of engines", value: registration.aircraftReference.engines?.stringValue))
         }
@@ -113,7 +114,6 @@ class RegistrationDetailManager {
         }
         aircraftRows.append(RegistrationDetailRow(label: "Weight category", value: registration.aircraftReference.weightCategory?.stringValue))
         aircraftRows.append(RegistrationDetailRow(label: "Certification basis", value: registration.aircraftReference.certificationBasis))
-        aircraftRows.append(RegistrationDetailRow(label: "Minimum crew", value: registration.aircraftReference.minCrew?.stringValue))
         aircraftRows.append(RegistrationDetailRow(label: "Noise class", value: registration.aircraftReference.noiseClass))
         if let noiseLevel = registration.aircraftReference.noiseLevel {
             aircraftRows.append(RegistrationDetailRow(label: "Noise level", value: "\(noiseLevel) dB(A)"))
