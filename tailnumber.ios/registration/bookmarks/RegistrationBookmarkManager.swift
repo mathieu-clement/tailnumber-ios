@@ -14,12 +14,19 @@ class RegistrationBookmarkManager {
 
     private let logger = Logger(label: "RegistrationBookmarkManager")
 
+    var listPublisher: ListPublisher<RegistrationBookmark>
+
     private init() {
         do {
             try dataStack.addStorageAndWait(SQLiteStore())
         } catch {
             logger.error("Error initializating data stack: \(error)")
         }
+        listPublisher = dataStack.listPublisher(
+                From<RegistrationBookmark>()
+                        .orderBy(.ascending(\.$tailnumber))
+//                        .orderBy(.descending(\.$dateAdded))
+        )
     }
 
     func addBookmark(registration: Registration) {
@@ -30,6 +37,7 @@ class RegistrationBookmarkManager {
                 bookmark.manufacturer = registration.aircraftReference.manufacturer
                 bookmark.model = registration.aircraftReference.model
                 bookmark.year = registration.aircraftReference.manufactureYear
+                bookmark.registrantName = registration.registrant?.name?.smartCapitalized ?? registration.`operator`?.name
             }, completion: { _ in })
         } catch {
             logger.error("Error bookmarking registration: \(error)")

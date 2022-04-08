@@ -47,7 +47,7 @@ struct AutocompleteResult: Decodable, Identifiable, Hashable {
         }
     }
 
-    var aircraftName: String? {
+    static func composeAircraftName(manufacturer: String?, model: String?, year: Int?) -> String? {
         var components: [String] = []
 
         if let model = model {
@@ -65,6 +65,10 @@ struct AutocompleteResult: Decodable, Identifiable, Hashable {
         } else {
             return components.joined(separator: ", ")
         }
+    }
+
+    var aircraftName: String? {
+        Self.composeAircraftName(manufacturer: manufacturer, model: model, year: year)
     }
 
     let registrationId: RegistrationId

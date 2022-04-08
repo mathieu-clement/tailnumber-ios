@@ -30,6 +30,8 @@ struct SearchView: View {
                     Text("Enter a tail number (e.g. N123 or HB-ABC), the owner name or part of the address")
                             .font(.caption)
                     Spacer()
+
+                    RegistrationBookmarkListView()
                 }
                         .padding()
                         .navigationTitle(navigationTitle)

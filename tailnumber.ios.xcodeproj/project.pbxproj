@@ -14,6 +14,7 @@
 		118222B227F846F400F99E4E /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 118222B127F846F400F99E4E /* Logging */; };
 		B9DA584C418F66C15368E996 /* Pods_Tail_Number.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30A38D8BCBA20B409C9194F2 /* Pods_Tail_Number.framework */; };
 		E29B3117EF909BB969FD912C /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29B32482F0FC656FF6AEC43 /* Extensions.swift */; };
+		E29B319F5145BE3AAA82C503 /* RegistrationBookmarkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29B32E56008B178625866C2 /* RegistrationBookmarkListView.swift */; };
 		E29B31E8FD1DA759D8535BF7 /* RegistrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29B334D995D39CF3E76CDCF /* RegistrationService.swift */; };
 		E29B32D9884009FC3D9948F7 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = E29B336C7C9C10E161D9380B /* .gitignore */; };
 		E29B33612DE8A74B4CD6CA4D /* RegistrationBookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29B37C6CDF67706CCF047E9 /* RegistrationBookmarkManager.swift */; };
@@ -45,6 +46,7 @@
 		E29B30AFCEF76FAAE9E0A4E3 /* Commons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Commons.swift; sourceTree = "<group>"; };
 		E29B31259896905650211C5F /* BookmarkModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BookmarkModels.swift; path = registration/bookmarks/BookmarkModels.swift; sourceTree = "<group>"; };
 		E29B32482F0FC656FF6AEC43 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		E29B32E56008B178625866C2 /* RegistrationBookmarkListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RegistrationBookmarkListView.swift; path = registration/bookmarks/RegistrationBookmarkListView.swift; sourceTree = "<group>"; };
 		E29B334D995D39CF3E76CDCF /* RegistrationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RegistrationService.swift; path = registration/services/RegistrationService.swift; sourceTree = "<group>"; };
 		E29B336C7C9C10E161D9380B /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = file.gitignore; path = .gitignore; sourceTree = "<group>"; };
 		E29B33A32DC9E34CE19DD7E8 /* SearchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SearchView.swift; path = registration/views/SearchView.swift; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 				E29B3CEE7958BA7E26FB6377 /* RegistrationHttpModels.swift */,
 				E29B37C6CDF67706CCF047E9 /* RegistrationBookmarkManager.swift */,
 				E29B31259896905650211C5F /* BookmarkModels.swift */,
+				E29B32E56008B178625866C2 /* RegistrationBookmarkListView.swift */,
 			);
 			path = tailnumber.ios;
 			sourceTree = "<group>";
@@ -297,6 +300,7 @@
 				E29B397AE144D516958ADDC8 /* RegistrationHttpModels.swift in Sources */,
 				E29B33612DE8A74B4CD6CA4D /* RegistrationBookmarkManager.swift in Sources */,
 				E29B3D2E1CB9B62AB14DA709 /* BookmarkModels.swift in Sources */,
+				E29B319F5145BE3AAA82C503 /* RegistrationBookmarkListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

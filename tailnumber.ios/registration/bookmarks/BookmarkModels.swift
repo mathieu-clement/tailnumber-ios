@@ -16,4 +16,7 @@ class RegistrationBookmark: CoreStoreObject {
 
     @Field.Stored("registrantName")
     var registrantName: String? = nil
+
+    @Field.Stored("dateAdded")
+    var dateAdded: Date = Date()
 }
