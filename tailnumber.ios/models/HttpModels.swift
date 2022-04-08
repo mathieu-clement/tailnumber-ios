@@ -118,20 +118,18 @@ struct WeightCategory: Decodable {
     let maxWeight: Weight?
 
     var stringValue: String {
-        let class_ = `class`.starts(with: "CLASS") ? "Class \(`class`.last!)" : `class`
-
         if let maxWeight = maxWeight {
             if minWeight.unit != maxWeight.unit {
-                return "\(class_) (\(minWeight.stringValue) - \(maxWeight.stringValue))"
+                return "\(minWeight.stringValue) - \(maxWeight.stringValue)"
             } else {
                 if minWeight.value == 0 {
-                    return "\(class_) (< \((maxWeight.value+1).formattedWithSeparator) \(maxWeight.unit.abbreviation))"
+                    return "< \((maxWeight.value+1).formattedWithSeparator) \(maxWeight.unit.abbreviation)"
                 } else {
-                    return "\(class_) (\(minWeight.value.formattedWithSeparator) - \(maxWeight.stringValue))"
+                    return "\(minWeight.value.formattedWithSeparator) - \(maxWeight.stringValue)"
                 }
             }
         } else {
-            return "\(class_) (> \(minWeight.stringValue))"
+            return "> \(minWeight.stringValue)"
         }
     }
 }

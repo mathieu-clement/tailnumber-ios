@@ -109,14 +109,20 @@ class RegistrationDetailManager {
             aircraftRows.append(RegistrationDetailRow(label: "Number of engines", value: registration.aircraftReference.engines?.stringValue))
         }
         if let speed = registration.aircraftReference.cruisingSpeed {
-            aircraftRows.append(RegistrationDetailRow(label: "Cruising speed", value: "\(speed.value) \(speed.unit.abbreviation)"))
+            if speed.unit == SpeedUnit.MPH {
+                let ktSpeed = Int((Double(speed.value) * 0.868976).rounded())
+                aircraftRows.append(RegistrationDetailRow(label: "Cruising speed",
+                        value: "\(speed.value) \(speed.unit.abbreviation) (\(ktSpeed) kt)"))
+            } else {
+                aircraftRows.append(RegistrationDetailRow(label: "Cruising speed", value: "\(speed.value) \(speed.unit.abbreviation)"))
+            }
         }
         aircraftRows.append(RegistrationDetailRow(label: "Serial number", value: registration.aircraftReference.serialNumber))
         if let code = registration.aircraftReference.transponderCode {
             aircraftRows.append(RegistrationDetailRow(label: "Transponder code", value:
             "\(code.code) (dec)\n\(code.octal) (oct)\n\(code.hex) (hex)"))
         }
-        aircraftRows.append(RegistrationDetailRow(label: "Weight category", value: registration.aircraftReference.weightCategory?.stringValue))
+        aircraftRows.append(RegistrationDetailRow(label: "Weight", value: registration.aircraftReference.weightCategory?.stringValue))
         aircraftRows.append(RegistrationDetailRow(label: "Certification basis", value: registration.aircraftReference.certificationBasis))
         aircraftRows.append(RegistrationDetailRow(label: "Noise class", value: registration.aircraftReference.noiseClass))
         if let noiseLevel = registration.aircraftReference.noiseLevel {
