@@ -8,7 +8,7 @@
 import Foundation
 import Logging
 
-enum RegistrationServiceError : Error {
+enum RegistrationServiceError: Error {
     case RegistrationNotFound, RegistrantNotFound, CountryNotFound, JsonError(_ error: Error), UnknownError
 }
 
@@ -26,54 +26,43 @@ class RegistrationService: ObservableObject {
         jsonDecoder.dateDecodingStrategy = .formatted(dateFormatter)
     }
 
-    func autocompleteTailnumberOrRegistrant(tailNumberOrRegistrant prefix: String,
-                                            onResult: @escaping ([AutocompleteResult]) -> Void) {
-        debounce_timer?.invalidate()
-        debounce_timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { [self] _ in
-            if (prefix.isEmpty) {
-                onResult([])
-                return
+    func autocompleteTailnumberOrRegistrant(tailNumberOrRegistrant prefix: String) async -> [AutocompleteResult] {
+        if (prefix.isEmpty) {
+            return []
+        }
+        guard let prefixParam = prefix.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {
+            logger.error("Prefix param was nil?? : \(prefix)")
+            return []
+        }
+        let urlString = "\(basePath)/any/\(prefixParam)"
+        guard let url = URL(string: urlString) else {
+            logger.error("Unwrapping url was nil?? : \(urlString)")
+            return []
+        }
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
+
+            switch ((response as? HTTPURLResponse)?.statusCode) {
+            case 200:
+                let results = try decodeAutocompleteResults(fromJson: data)
+                if results.isEmpty {
+                    logger.warning("Something must have gone wrong. 200 status but empty results.")
+                }
+                return results
+
+            case 404:
+                return []
+
+            default:
+                throw RegistrationServiceError.UnknownError
             }
-            guard let prefixParam = prefix.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {
-                logger.error("Prefix param was nil?? : \(prefix)")
-                onResult([])
-                return
-            }
-            let urlString = "\(basePath)/any/\(prefixParam)"
-            guard let url = URL(string: urlString) else {
-                logger.error("Unwrapping url was nil?? : \(urlString)")
-                onResult([])
-                return
-            }
-            var request = URLRequest(url: url)
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-            URLSession.shared.dataTask(with: url) { data, response, error in
-                        if let error = error {
-                            self.logger.error("Error with autocomplete: \(error)")
-                            Commons.alert(title: "Error", message: error.localizedDescription) {
-                            }
-                        }
-                        switch ((response as? HTTPURLResponse)?.statusCode) {
-                        case 200:
-                            if let data = data {
-                                let results = decodeAutocompleteResults(fromJson: data,
-                                        onFailure: { jsonError in onResult([]) })
-                                if results.isEmpty {
-                                    self.logger.warning("Something must have gone wrong. 200 status but empty results.")
-                                }
-                                onResult(results)
-                            }
-
-                        case 404:
-                            onResult([])
-
-
-                        default:
-                            onResult([])
-                        }
-                    }
-                    .resume()
+        } catch {
+            logger.error("Error with autocomplete: \(error)")
+//                Commons.alert(title: "Error", message: error.localizedDescription) { }
+            return []
         }
     }
 
@@ -102,7 +91,8 @@ class RegistrationService: ObservableObject {
             }
         } catch {
             logger.error("Error fetching registration: \(error)")
-            Commons.alert(title: "Error", message: error.localizedDescription) {}
+            Commons.alert(title: "Error", message: error.localizedDescription) {
+            }
             throw error
         }
     }
@@ -116,14 +106,12 @@ class RegistrationService: ObservableObject {
         }
     }
 
-    private func decodeAutocompleteResults(fromJson data: Data, onFailure: @escaping (RegistrationServiceError) -> Void) -> [AutocompleteResult] {
+    private func decodeAutocompleteResults(fromJson data: Data) throws -> [AutocompleteResult] {
         do {
             return try jsonDecoder.decode([AutocompleteResult].self, from: data)
         } catch {
-            // TODO handle errors better
             logger.error("Error decoding autocomplete result: \(error)")
-            onFailure(RegistrationServiceError.JsonError(error))
-            return []
+            throw RegistrationServiceError.JsonError(error)
         }
     }
 }

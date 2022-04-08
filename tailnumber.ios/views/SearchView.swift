@@ -21,7 +21,9 @@ struct SearchView: View {
             searchText.value = $0//.uppercased()
             if searchText.value.count > 2 {
                 isSearching = true
-                fetchSuggestions()
+                Task {
+                    await fetchSuggestions()
+                }
             } else {
                 autocompleteResults = []
             }
@@ -49,7 +51,8 @@ struct SearchView: View {
                 ZStack {
                     NavigationLink(destination: RegistrationDetailView(forTailnumber: searchText.value), isActive: $navigateOnSubmitEnabled) {
 
-                    }.hidden()
+                    }
+                            .hidden()
                     List(autocompleteResults, id: \.self) { result in
                         let detailView = RegistrationDetailView(forTailnumber: result.registrationId.id)
                         NavigationLink(destination: detailView) {
@@ -77,11 +80,9 @@ struct SearchView: View {
                 .environmentObject(searchText)
     }
 
-    private func fetchSuggestions() {
-        registrationService.autocompleteTailnumberOrRegistrant(tailNumberOrRegistrant: searchText.value) { results in
-            autocompleteResults = results
-            isSearching = false
-        }
+    private func fetchSuggestions() async {
+        autocompleteResults = await registrationService.autocompleteTailnumberOrRegistrant(tailNumberOrRegistrant: searchText.value)
+        isSearching = false
     }
 }
 
