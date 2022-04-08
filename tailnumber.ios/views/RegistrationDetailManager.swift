@@ -6,7 +6,7 @@ import Foundation
 
 class RegistrationDetailManager {
 
-    func registrationSection(forRegistrationResult registrationResult: RegistrationResult) -> RegistrationDetailSection {
+    func registrationSectionGroup(forRegistrationResult registrationResult: RegistrationResult) -> RegistrationDetailSectionGroup {
         let registration = registrationResult.registration
         var registrationRows: [RegistrationDetailRow] = []
         if registration.status != "VALID" && registration.status != "REGISTERED" {
@@ -69,7 +69,7 @@ class RegistrationDetailManager {
 
 //        registrationRows.append(RegistrationDetailRow(label: "Data fetched", value: registrationResult.lastUpdate.usFormat))
 
-        return RegistrationDetailSection(label: "Registration", systemImage: "doc.plaintext", rows: registrationRows)
+        return RegistrationDetailSectionGroup(label: "Registration", systemImage: "doc.plaintext", sections: [RegistrationDetailSection(label: "Registration", rows: registrationRows)])
     }
 
     private func toString(address: Address) -> String {
@@ -86,7 +86,7 @@ class RegistrationDetailManager {
         return addressString
     }
 
-    func aircraftSection(forRegistration registration: Registration) -> RegistrationDetailSection {
+    func aircraftSectionGroup(forRegistration registration: Registration) -> RegistrationDetailSectionGroup {
         var aircraftRows: [RegistrationDetailRow] = []
         aircraftRows.append(RegistrationDetailRow(label: "Manufacturer", value: registration.aircraftReference.manufacturer?.smartCapitalized))
         aircraftRows.append(RegistrationDetailRow(label: "Marketing designation", value: registration.aircraftReference.marketingDesignation))
@@ -137,10 +137,10 @@ class RegistrationDetailManager {
             systemImage = "airplane"
         }
 
-        return RegistrationDetailSection(label: "Aircraft", systemImage: systemImage, image: image, rows: aircraftRows)
+        return RegistrationDetailSectionGroup(label: "Aircraft", systemImage: systemImage, image: image, sections: [RegistrationDetailSection(label: "Aircraft", rows: aircraftRows)])
     }
 
-    func engineSections(forRegistration registration: Registration) -> [RegistrationDetailSection] {
+    func engineSectionGroup(forRegistration registration: Registration) -> RegistrationDetailSectionGroup {
         // TODO transform to have two paragraphs in the same section instead of two sections
         var results: [RegistrationDetailSection] = []
         if let engines = registration.engineReferences {
@@ -184,15 +184,14 @@ class RegistrationDetailManager {
                 let sectionLabel = engines.count == 1
                         ? (engine.count != nil && engine.count! > 1 ? "Engines" : "Engine")
                         : "Engine \(i + 1)"
-                results.append(RegistrationDetailSection(label: sectionLabel, image: "engine", rows: engineRows))
+                results.append(RegistrationDetailSection(label: sectionLabel, rows: engineRows))
             }
         }
 
-        return results
+        return RegistrationDetailSectionGroup(label: "Engines", image: "engine", sections: results)
     }
 
-    func propellerSections(forRegistration registration: Registration) -> [RegistrationDetailSection] {
-        // TODO transform to have two paragraphs in the same section instead of two sections
+    func propellerSectionGroup(forRegistration registration: Registration) -> RegistrationDetailSectionGroup {
         var results: [RegistrationDetailSection] = []
         if let propellers = registration.propellerReferences {
             (0..<propellers.count).forEach { i in
@@ -207,11 +206,11 @@ class RegistrationDetailManager {
                 let sectionLabel = propellers.count == 1
                         ? (propeller.count != nil && propeller.count! > 1 ? "Propellers" : "Propeller")
                         : "Propeller \(i + 1)"
-                results.append(RegistrationDetailSection(label: sectionLabel, image: "propeller", rows: engineRows))
+                results.append(RegistrationDetailSection(label: sectionLabel, rows: engineRows))
             }
         }
 
-        return results
+        return RegistrationDetailSectionGroup(label: "Propellers", image: "propeller", sections: results)
     }
 
     private func joinNotNull(_ input: [String?], separator: String = ", ") -> String {

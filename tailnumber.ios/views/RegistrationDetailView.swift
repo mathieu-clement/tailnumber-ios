@@ -14,7 +14,7 @@ struct RegistrationDetailView: View {
     private let tailnumber: String
 
     @State private var registrationResult: RegistrationResult? = nil
-    @State private var sections: [RegistrationDetailSection] = []
+    @State private var sectionGroups: [RegistrationDetailSectionGroup] = []
     @State private var lastUpdate: Date? = nil
     @State private var selectedSection = 0
     @Environment(\.presentationMode) var presentation
@@ -32,26 +32,37 @@ struct RegistrationDetailView: View {
         } else {
             VStack {
                 Picker(selection: $selectedSection, label: Text("Section:")) {
-                    ForEach(0..<sections.count, id: \.self) { i in
+                    ForEach(0..<sectionGroups.count, id: \.self) { i in
 //                        Text(sections[i].label)
-                        let section = sections[i]
-                        if let image = section.image {
+                        let sectionGroup = sectionGroups[i]
+                        if let image = sectionGroup.image {
                             Image("\(image)_32_padded")
-                                    .tag(section.label)
-                        } else if let systemImage = section.systemImage {
-                            Image(systemName: systemImage).tag(section.label)
+                                    .tag(sectionGroup.label)
+                        } else if let systemImage = sectionGroup.systemImage {
+                            Image(systemName: systemImage).tag(sectionGroup.label)
                         }
                     }
                 }
                         .pickerStyle(.segmented)
                         .padding([.leading, .trailing, .bottom])
 
-                if !sections.isEmpty {
+                if !sectionGroups.isEmpty {
                     ScrollView {
-                        let section = sections[selectedSection]
-                        Text(section.label).font(.headline)
-                                .padding([.bottom])
-                        RegistrationDetailSectionView(label: section.label, rows: section.rows)
+
+                        ForEach(0..<sectionGroups[selectedSection].sections.count, id: \.self) { i in
+                            let section = sectionGroups[selectedSection].sections[i]
+                            if i == 0 {
+                                Text(section.label)
+                                        .font(.headline)
+                                        .padding([.bottom])
+                            } else {
+                                Text(section.label)
+                                        .font(.headline)
+                                        .padding([.bottom, .top])
+                            }
+                            RegistrationDetailSectionView(label: section.label, rows: section.rows)
+                        }
+
                         if let lastUpdate = lastUpdate {
                             Text("Last update: \(lastUpdate.userLocaleFormat)").font(.caption)
                         }
@@ -73,14 +84,22 @@ struct RegistrationDetailView: View {
 
     private func createTable() {
         guard let registration = registrationResult?.registration else {
-            sections = []
+            sectionGroups = []
             return
         }
 
-        sections.append(registrationDetailManager.registrationSection(forRegistrationResult: registrationResult!))
-        sections.append(registrationDetailManager.aircraftSection(forRegistration: registration))
-        sections += registrationDetailManager.engineSections(forRegistration: registration)
-        sections += registrationDetailManager.propellerSections(forRegistration: registration)
+        sectionGroups = []
+
+        addSection(group: registrationDetailManager.registrationSectionGroup(forRegistrationResult: registrationResult!))
+        addSection(group: registrationDetailManager.aircraftSectionGroup(forRegistration: registration))
+        addSection(group: registrationDetailManager.engineSectionGroup(forRegistration: registration))
+        addSection(group: registrationDetailManager.propellerSectionGroup(forRegistration: registration))
+    }
+
+    private func addSection(group: RegistrationDetailSectionGroup) {
+        if !group.sections.isEmpty {
+            sectionGroups.append(group)
+        }
     }
 
     private func fetchRegistration() async {

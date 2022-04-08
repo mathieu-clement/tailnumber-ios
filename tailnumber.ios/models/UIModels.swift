@@ -5,19 +5,25 @@
 import Foundation
 import SwiftUI
 
-struct RegistrationDetailSection: Identifiable {
+struct RegistrationDetailSectionGroup: Identifiable {
+    var id = UUID()
     let label: String
     let systemImage: String?
     let image: String?
-    let rows: [RegistrationDetailRow]
-    var id : String { label }
+    let sections: [RegistrationDetailSection]
 
-    init(label: String, systemImage: String? = nil, image: String? = nil, rows: [RegistrationDetailRow]) {
+    init(label: String, systemImage: String? = nil, image: String? = nil, sections: [RegistrationDetailSection]) {
         self.label = label
         self.systemImage = systemImage
         self.image = image
-        self.rows = rows
+        self.sections = sections
     }
+}
+
+struct RegistrationDetailSection: Identifiable {
+    let label: String
+    let rows: [RegistrationDetailRow]
+    var id : String { label }
 }
 
 struct RegistrationDetailRow: Identifiable, Hashable {
