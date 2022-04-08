@@ -69,7 +69,7 @@ class RegistrationDetailManager {
 
 //        registrationRows.append(RegistrationDetailRow(label: "Data fetched", value: registrationResult.lastUpdate.usFormat))
 
-        return RegistrationDetailSection(label: "Registration", image: "doc.plaintext", rows: registrationRows)
+        return RegistrationDetailSection(label: "Registration", systemImage: "doc.plaintext", rows: registrationRows)
     }
 
     private func toString(address: Address) -> String {
@@ -124,7 +124,20 @@ class RegistrationDetailManager {
         }
         aircraftRows.append(RegistrationDetailRow(label: "Legal basis", value: registration.aircraftReference.legalBasis))
 
-        return RegistrationDetailSection(label: "Aircraft", image: "airplane", rows: aircraftRows)
+        var image: String? = nil
+        var systemImage: String? = nil
+        switch (registration.aircraftReference.aircraftType) {
+        case "HELICOPTER":
+            image = "helicopter"
+        case "GLIDER", "POWERED_GLIDER":
+            image = "glider2"
+        case "BALLOON":
+            image = "balloon"
+        default:
+            systemImage = "airplane"
+        }
+
+        return RegistrationDetailSection(label: "Aircraft", systemImage: systemImage, image: image, rows: aircraftRows)
     }
 
     func engineSections(forRegistration registration: Registration) -> [RegistrationDetailSection] {
@@ -171,7 +184,7 @@ class RegistrationDetailManager {
                 let sectionLabel = engines.count == 1
                         ? (engine.count != nil && engine.count! > 1 ? "Engines" : "Engine")
                         : "Engine \(i + 1)"
-                results.append(RegistrationDetailSection(label: sectionLabel, image: "bolt.fill", rows: engineRows))
+                results.append(RegistrationDetailSection(label: sectionLabel, image: "engine", rows: engineRows))
             }
         }
 
@@ -194,7 +207,7 @@ class RegistrationDetailManager {
                 let sectionLabel = propellers.count == 1
                         ? (propeller.count != nil && propeller.count! > 1 ? "Propellers" : "Propeller")
                         : "Propeller \(i + 1)"
-                results.append(RegistrationDetailSection(label: sectionLabel, image: "line.diagonal", rows: engineRows))
+                results.append(RegistrationDetailSection(label: sectionLabel, image: "propeller", rows: engineRows))
             }
         }
 

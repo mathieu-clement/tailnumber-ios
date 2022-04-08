@@ -18,7 +18,7 @@ struct RegistrationDetailView: View {
     @State private var lastUpdate: Date? = nil
     @State private var selectedSection = 0
     @Environment(\.presentationMode) var presentation
-    private var loadingText : String = LocalizationManager().randomLoadingText()
+    private var loadingText: String = LocalizationManager().randomLoadingText()
 
     init(forTailnumber: String) {
         tailnumber = forTailnumber
@@ -34,7 +34,13 @@ struct RegistrationDetailView: View {
                 Picker(selection: $selectedSection, label: Text("Section:")) {
                     ForEach(0..<sections.count, id: \.self) { i in
 //                        Text(sections[i].label)
-                        Image(systemName: sections[i].image).tag(sections[i].label)
+                        let section = sections[i]
+                        if let image = section.image {
+                            Image("\(image)_32_padded")
+                                    .tag(section.label)
+                        } else if let systemImage = section.systemImage {
+                            Image(systemName: systemImage).tag(section.label)
+                        }
                     }
                 }
                         .pickerStyle(.segmented)
@@ -77,46 +83,44 @@ struct RegistrationDetailView: View {
         sections += registrationDetailManager.propellerSections(forRegistration: registration)
     }
 
-    private func fetchRegistration() {
+    private func fetchRegistration() async {
         logger.debug("Fetching registration async for \(tailnumber)...")
 
-        registrationService.fetchRegistrationAsync(forTailNumber: tailnumber,
-                onSuccess: { regResult in
-                    DispatchQueue.main.async {
-                        self.registrationResult = regResult
-                        self.lastUpdate = regResult.lastUpdate
-                        createTable()
-                    }
-                },
-                onFailure: { error in
-                    let title: String
-                    let message: String
-                    switch (error) {
-                    case .CountryNotFound:
-                        title = "Country not found"
-                        message = "Verify the registration starts with the country code (e.g. \"N\")"
-                    case .RegistrantNotFound:
-                        title = "No records found"
-                        message = "There were no records matching the query."
-                    case .RegistrationNotFound:
-                        title = "\"\(tailnumber)\" not found"
-                        message = "Did you include the country code (e.g. \"N\", \"HB\")?"
-                    default:
-                        title = "Unknown error"
-                        message = "An unknown error occurred. We are investigating it."
-                    }
+        do {
+            registrationResult = try await registrationService.fetchRegistration(forTailNumber: tailnumber)
+            self.lastUpdate = registrationResult?.lastUpdate
+            createTable()
+        } catch {
+            let title: String
+            let message: String
+            switch (error as? RegistrationServiceError) {
+            case .CountryNotFound:
+                title = "Country not found"
+                message = "Verify the registration starts with the country code (e.g. \"N\")"
+            case .RegistrantNotFound:
+                title = "No records found"
+                message = "There were no records matching the query."
+            case .RegistrationNotFound:
+                title = "\"\(tailnumber)\" not found"
+                message = "Did you include the country code (e.g. \"N\", \"HB\")?"
+            default:
+                title = "Unknown error"
+                message = "An unknown error occurred. We are investigating it."
+            }
 
-                    DispatchQueue.main.async {
-                        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: "Go back", style: .cancel, handler: { _ in
-                            presentation.wrappedValue.dismiss()
-                        }))
-                        alert.addAction(UIAlertAction(title: "Try again", style: .default, handler: { _ in
-                            fetchRegistration()
-                        }))
-                        UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true)
-                    }
-                })
+            DispatchQueue.main.async {
+                let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Go back", style: .cancel, handler: { _ in
+                    presentation.wrappedValue.dismiss()
+                }))
+                /*
+                alert.addAction(UIAlertAction(title: "Try again", style: .default, handler: { _ in
+                    fetchRegistration()
+                }))
+                 */
+                UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true)
+            }
+        }
     }
 
 }

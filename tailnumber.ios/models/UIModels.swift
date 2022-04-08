@@ -7,9 +7,17 @@ import SwiftUI
 
 struct RegistrationDetailSection: Identifiable {
     let label: String
-    let image: String
+    let systemImage: String?
+    let image: String?
     let rows: [RegistrationDetailRow]
     var id : String { label }
+
+    init(label: String, systemImage: String? = nil, image: String? = nil, rows: [RegistrationDetailRow]) {
+        self.label = label
+        self.systemImage = systemImage
+        self.image = image
+        self.rows = rows
+    }
 }
 
 struct RegistrationDetailRow: Identifiable, Hashable {
