@@ -1,6 +1,3 @@
-//
-// Created by Mathieu Clement on 03.04.22.
-//
 
 import UIKit
 import MapKit

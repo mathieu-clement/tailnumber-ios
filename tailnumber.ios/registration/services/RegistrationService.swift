@@ -1,9 +1,3 @@
-//
-//  HttpClient.swift
-//  tailnumber.ios
-//
-//  Created by Mathieu Clement on 31.03.22.
-//
 
 import Foundation
 import Logging

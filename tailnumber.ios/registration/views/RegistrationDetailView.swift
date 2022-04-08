@@ -1,6 +1,3 @@
-//
-// Created by Mathieu Clement on 01.04.22.
-//
 
 import Foundation
 import Logging
@@ -10,6 +7,7 @@ struct RegistrationDetailView: View {
     private let logger = Logger(label: "RegistrationDetailView")
     private let registrationService = RegistrationService()
     private let registrationDetailManager = RegistrationDetailManager()
+    private let bookmarkManager = RegistrationBookmarkManager.instance
 
     private let tailnumber: String
 
@@ -17,6 +15,7 @@ struct RegistrationDetailView: View {
     @State private var sectionGroups: [RegistrationDetailSectionGroup] = []
     @State private var lastUpdate: Date? = nil
     @State private var selectedSection = 0
+    @State private var isBookmarked = false
     @Environment(\.presentationMode) var presentation
     private var loadingText: String = LocalizationManager().randomLoadingText()
 
@@ -28,6 +27,7 @@ struct RegistrationDetailView: View {
         if (registrationResult == nil) {
             ProgressView("\(loadingText)...").task {
                 await fetchRegistration()
+                fetchIsBookmarked()
             }
         } else {
             VStack {
@@ -79,6 +79,25 @@ struct RegistrationDetailView: View {
             }
                     .padding()
                     .navigationTitle(registrationResult?.registration.registrationId.id ?? tailnumber)
+                    .toolbar {
+                        if isBookmarked {
+                            Image(systemName: "star.fill")
+                                    .foregroundColor(.accentColor)
+                                    .onTapGesture {
+                                        bookmarkManager.removeBookmark(tailnumber: tailnumber)
+                                        isBookmarked = false
+                                    }
+                        } else {
+                            Image(systemName: "star")
+                                    .foregroundColor(.accentColor)
+                                    .onTapGesture {
+                                        if let registration = registrationResult?.registration {
+                                            bookmarkManager.addBookmark(registration: registration)
+                                            isBookmarked = true
+                                        }
+                                    }
+                        }
+                    }
         }
     }
 
@@ -100,6 +119,10 @@ struct RegistrationDetailView: View {
         if !group.sections.isEmpty {
             sectionGroups.append(group)
         }
+    }
+
+    private func fetchIsBookmarked() {
+        self.isBookmarked = bookmarkManager.isBookmarked(tailnumber: tailnumber)
     }
 
     private func fetchRegistration() async {

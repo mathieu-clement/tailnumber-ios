@@ -1,9 +1,3 @@
-//
-//  tailnumber_iosApp.swift
-//  tailnumber.ios
-//
-//  Created by Mathieu Clement on 30.03.22.
-//
 
 import SwiftUI
 

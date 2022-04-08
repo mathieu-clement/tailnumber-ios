@@ -1,6 +1,3 @@
-//
-// Created by Mathieu Clement on 02.04.22.
-//
 
 import Foundation
 
