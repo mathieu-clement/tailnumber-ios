@@ -26,8 +26,8 @@ struct RegistrationDetailView: View {
 
     var body: some View {
         if (registrationResult == nil) {
-            ProgressView("\(loadingText)...").onAppear {
-                fetchRegistration()
+            ProgressView("\(loadingText)...").task {
+                await fetchRegistration()
             }
         } else {
             VStack {

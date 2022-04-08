@@ -8,7 +8,7 @@
 import Foundation
 import Logging
 
-enum RegistrationServiceError {
+enum RegistrationServiceError : Error {
     case RegistrationNotFound, RegistrantNotFound, CountryNotFound, JsonError(_ error: Error), UnknownError
 }
 
@@ -17,7 +17,7 @@ class RegistrationService: ObservableObject {
     private let basePath = "https://tailnumber-service-dev.edelweiss-software.com/registrations"
     private let jsonDecoder = JSONDecoder()
     private let logger = Logger(label: "RegistrationService")
-    private var debounce_timer : Timer?
+    private var debounce_timer: Timer?
 
     init() {
         let dateFormatter = DateFormatter()
@@ -51,13 +51,14 @@ class RegistrationService: ObservableObject {
             URLSession.shared.dataTask(with: url) { data, response, error in
                         if let error = error {
                             self.logger.error("Error with autocomplete: \(error)")
-                            Commons.alert(title: "Error", message: error.localizedDescription) { }
+                            Commons.alert(title: "Error", message: error.localizedDescription) {
+                            }
                         }
                         switch ((response as? HTTPURLResponse)?.statusCode) {
                         case 200:
                             if let data = data {
                                 let results = decodeAutocompleteResults(fromJson: data,
-                                        onFailure: { jsonError in onResult([]) } )
+                                        onFailure: { jsonError in onResult([]) })
                                 if results.isEmpty {
                                     self.logger.warning("Something must have gone wrong. 200 status but empty results.")
                                 }
@@ -76,52 +77,42 @@ class RegistrationService: ObservableObject {
         }
     }
 
-    func fetchRegistrationAsync(forTailNumber tailnumber: String,
-                                onSuccess: @escaping (RegistrationResult) -> Void,
-                                onFailure: @escaping (RegistrationServiceError) -> Void) {
+    @MainActor
+    func fetchRegistration(forTailNumber tailnumber: String) async throws -> RegistrationResult? {
         let urlOpt = URL(string: "\(basePath)/\(tailnumber)")
         guard let url = urlOpt else {
-            return
+            logger.error("Empty URL?!")
+            return nil
         }
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        URLSession.shared.dataTask(with: url) { data, response, error in
-                    if let error = error {
-                        self.logger.error("Error fetching registration: \(error)")
-                        Commons.alert(title: "Error", message: error.localizedDescription) { }
-                        return
-                    }
-                    switch ((response as? HTTPURLResponse)?.statusCode) {
-                    case 200:
-                        if let data = data {
-                            if let registrationResult = self.decodeRegistrationResult(fromJson: data, onFailure: { jsonError in
-                                self.logger.error("JSON error: \(jsonError)")
-                                onFailure(jsonError)
-                            }
-                            ) {
-                                onSuccess(registrationResult)
-                            }
-                        }
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
 
-                    case 404:
-                        onFailure(RegistrationServiceError.RegistrationNotFound)
+            switch ((response as? HTTPURLResponse)?.statusCode) {
+            case 200:
+                return try decodeRegistrationResult(fromJson: data)
 
+            case 404:
+                throw RegistrationServiceError.RegistrationNotFound
 
-                    default:
-                        onFailure(RegistrationServiceError.UnknownError)
-                    }
-                }
-                .resume()
+            default:
+                throw RegistrationServiceError.UnknownError
+            }
+        } catch {
+            logger.error("Error fetching registration: \(error)")
+            Commons.alert(title: "Error", message: error.localizedDescription) {}
+            throw error
+        }
     }
 
-    private func decodeRegistrationResult(fromJson data: Data, onFailure: @escaping (RegistrationServiceError) -> Void) -> RegistrationResult? {
+    private func decodeRegistrationResult(fromJson data: Data) throws -> RegistrationResult? {
         do {
             return try jsonDecoder.decode(RegistrationResult.self, from: data)
         } catch {
-            // TODO handle errors better
-            onFailure(RegistrationServiceError.JsonError(error))
-            return nil
+            self.logger.error("JSON error: \(error)")
+            throw RegistrationServiceError.JsonError(error)
         }
     }
 
