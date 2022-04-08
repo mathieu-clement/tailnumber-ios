@@ -57,7 +57,7 @@ class RegistrationDetailManager {
             }
         }
         if !airworthiness.isEmpty && !airworthiness.allSatisfy({ s in s == nil }) {
-            registrationRows.append(RegistrationDetailRow(label: "Airworthiness categories",
+            registrationRows.append(RegistrationDetailRow(label: "Airworthiness cat.",
                     value: joinNotNull(airworthiness)))
         }
 
@@ -81,7 +81,7 @@ class RegistrationDetailManager {
         let fields = [address.street1?.smartCapitalized,
                       address.street2?.smartCapitalized,
                       cityAndStateAndZip,
-                      address.country]
+                      address.country == "US" ? nil : address.country]
         let addressString = joinNotNull(fields, separator: "\n")
         return addressString
     }
@@ -123,12 +123,12 @@ class RegistrationDetailManager {
             "\(code.code) (dec)\n\(code.octal) (oct)\n\(code.hex) (hex)"))
         }
         aircraftRows.append(RegistrationDetailRow(label: "Weight", value: registration.aircraftReference.weightCategory?.stringValue))
+        aircraftRows.append(RegistrationDetailRow(label: "Legal basis", value: registration.aircraftReference.legalBasis))
         aircraftRows.append(RegistrationDetailRow(label: "Certification basis", value: registration.aircraftReference.certificationBasis))
         aircraftRows.append(RegistrationDetailRow(label: "Noise class", value: registration.aircraftReference.noiseClass))
         if let noiseLevel = registration.aircraftReference.noiseLevel {
             aircraftRows.append(RegistrationDetailRow(label: "Noise level", value: "\(noiseLevel) dB(A)"))
         }
-        aircraftRows.append(RegistrationDetailRow(label: "Legal basis", value: registration.aircraftReference.legalBasis))
 
         var image: String? = nil
         var systemImage: String? = nil

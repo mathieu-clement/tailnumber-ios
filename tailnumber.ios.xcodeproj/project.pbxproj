@@ -29,7 +29,7 @@
 
 /* Begin PBXFileReference section */
 		037BB2A57FF08284B60A1331 /* Pods-tailnumber.ios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tailnumber.ios.release.xcconfig"; path = "Target Support Files/Pods-tailnumber.ios/Pods-tailnumber.ios.release.xcconfig"; sourceTree = "<group>"; };
-		11322E7D27F4B71900043DBC /* tailnumber.ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tailnumber.ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		11322E7D27F4B71900043DBC /* Tail Number.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Tail Number.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		11322E8027F4B71900043DBC /* tailnumber_iosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = tailnumber_iosApp.swift; sourceTree = "<group>"; };
 		11322E8427F4B71B00043DBC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		11322E8727F4B71B00043DBC /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -77,7 +77,7 @@
 		11322E7E27F4B71900043DBC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				11322E7D27F4B71900043DBC /* tailnumber.ios.app */,
+				11322E7D27F4B71900043DBC /* Tail Number.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -156,9 +156,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		11322E7C27F4B71900043DBC /* tailnumber.ios */ = {
+		11322E7C27F4B71900043DBC /* Tail Number */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 11322E8B27F4B71B00043DBC /* Build configuration list for PBXNativeTarget "tailnumber.ios" */;
+			buildConfigurationList = 11322E8B27F4B71B00043DBC /* Build configuration list for PBXNativeTarget "Tail Number" */;
 			buildPhases = (
 				011043992FDD29FAB10AC8AA /* [CP] Check Pods Manifest.lock */,
 				11322E7927F4B71900043DBC /* Sources */,
@@ -169,13 +169,13 @@
 			);
 			dependencies = (
 			);
-			name = tailnumber.ios;
+			name = "Tail Number";
 			packageProductDependencies = (
 				118222AE27F8462F00F99E4E /* OrderedCollections */,
 				118222B127F846F400F99E4E /* Logging */,
 			);
 			productName = tailnumber.ios;
-			productReference = 11322E7D27F4B71900043DBC /* tailnumber.ios.app */;
+			productReference = 11322E7D27F4B71900043DBC /* Tail Number.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -203,14 +203,14 @@
 			);
 			mainGroup = 11322E7427F4B71900043DBC;
 			packageReferences = (
-				118222AD27F8462F00F99E4E /* XCRemoteSwiftPackageReference "swift-collections.git" */,
-				118222B027F846F400F99E4E /* XCRemoteSwiftPackageReference "swift-log.git" */,
+				118222AD27F8462F00F99E4E /* XCRemoteSwiftPackageReference "swift-collections" */,
+				118222B027F846F400F99E4E /* XCRemoteSwiftPackageReference "swift-log" */,
 			);
 			productRefGroup = 11322E7E27F4B71900043DBC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				11322E7C27F4B71900043DBC /* tailnumber.ios */,
+				11322E7C27F4B71900043DBC /* Tail Number */,
 			);
 		};
 /* End PBXProject section */
@@ -331,6 +331,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "Tail Number";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -384,6 +385,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "Tail Number";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -465,7 +467,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		11322E8B27F4B71B00043DBC /* Build configuration list for PBXNativeTarget "tailnumber.ios" */ = {
+		11322E8B27F4B71B00043DBC /* Build configuration list for PBXNativeTarget "Tail Number" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				11322E8C27F4B71B00043DBC /* Debug */,
@@ -477,7 +479,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		118222AD27F8462F00F99E4E /* XCRemoteSwiftPackageReference "swift-collections.git" */ = {
+		118222AD27F8462F00F99E4E /* XCRemoteSwiftPackageReference "swift-collections" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-collections.git";
 			requirement = {
@@ -485,7 +487,7 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		118222B027F846F400F99E4E /* XCRemoteSwiftPackageReference "swift-log.git" */ = {
+		118222B027F846F400F99E4E /* XCRemoteSwiftPackageReference "swift-log" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-log.git";
 			requirement = {
@@ -498,12 +500,12 @@
 /* Begin XCSwiftPackageProductDependency section */
 		118222AE27F8462F00F99E4E /* OrderedCollections */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 118222AD27F8462F00F99E4E /* XCRemoteSwiftPackageReference "swift-collections.git" */;
+			package = 118222AD27F8462F00F99E4E /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = OrderedCollections;
 		};
 		118222B127F846F400F99E4E /* Logging */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 118222B027F846F400F99E4E /* XCRemoteSwiftPackageReference "swift-log.git" */;
+			package = 118222B027F846F400F99E4E /* XCRemoteSwiftPackageReference "swift-log" */;
 			productName = Logging;
 		};
 /* End XCSwiftPackageProductDependency section */

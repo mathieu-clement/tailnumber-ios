@@ -47,11 +47,7 @@ class RegistrationService: ObservableObject {
 
             switch ((response as? HTTPURLResponse)?.statusCode) {
             case 200:
-                let results = try decodeAutocompleteResults(fromJson: data)
-                if results.isEmpty {
-                    logger.warning("Something must have gone wrong. 200 status but empty results.")
-                }
-                return results
+                return try decodeAutocompleteResults(fromJson: data)
 
             case 404:
                 return []
@@ -91,8 +87,6 @@ class RegistrationService: ObservableObject {
             }
         } catch {
             logger.error("Error fetching registration: \(error)")
-            Commons.alert(title: "Error", message: error.localizedDescription) {
-            }
             throw error
         }
     }
