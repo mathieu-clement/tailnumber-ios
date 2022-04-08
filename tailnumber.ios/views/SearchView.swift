@@ -14,7 +14,7 @@ struct SearchView: View {
     @State private var model: String = ""
     @State private var isSearching = false
     @State private var navigateOnSubmitEnabled = false
-    private let navigationTitle = "Tail Number"
+    private let navigationTitle = "Search"
 
     var body: some View {
         let searchTextBinding = Binding<String>(get: { searchText.value }, set: {
